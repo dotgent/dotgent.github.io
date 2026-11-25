@@ -345,24 +345,30 @@ setInterval(function(){
   $("tickText").textContent = tickMsgs[tickIdx];
 }, 5000);
 
-/* ============ chain reads ============ */
-function readContract(){
+/* ============ chain reads (raw eth_call — no library, fast) ============ */
+var SEL = { freeSold: "0xa37d6e0f", paidSold: "0x10b985d4", balanceOf: "0x70a08231" };
+async function ethCall(data){
   for (var i = 0; i < RPCS.length; i++){
-    try { return new ethers.Contract(CONTRACT, ABI, new ethers.JsonRpcProvider(RPCS[i], 56)); }
-    catch(e){ /* next */ }
+    try {
+      var r = await fetch(RPCS[i], { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "eth_call", params: [{ to: CONTRACT, data: data }, "latest"] }) });
+      var j = await r.json();
+      if (j && j.result) return j.result;
+    } catch(e){ /* try next RPC */ }
   }
   return null;
 }
 async function refreshStats(){
-  if (!CONTRACT || typeof ethers === "undefined") return;
+  if (!CONTRACT) return;
   try {
-    var c = readContract(); if (!c) return;
-    var f = Number(await c.freeSold()), p = Number(await c.paidSold());
+    var rf = await ethCall(SEL.freeSold); if (!rf) return;
+    var rp = await ethCall(SEL.paidSold); if (!rp) return;
+    var f = parseInt(rf, 16), p = parseInt(rp, 16);
     state.free = f; state.paid = p; state.lit = f + p;
     $("statLit").textContent = fmt(state.lit) + " / 6,000";
     if (wallet) {
-      var bal = await c.balanceOf(wallet);
-      $("statMine").textContent = fmt(bal / SHARE);
+      var rb = await ethCall(SEL.balanceOf + "000000000000000000000000" + wallet.slice(2).toLowerCase());
+      if (rb) $("statMine").textContent = fmt(BigInt(rb) / SHARE);
     }
     drawGauge(); updateButtons();
   } catch(e){ /* silent */ }
@@ -490,7 +496,7 @@ $("btnBuy").addEventListener("click", function(){
 drawGauge(); placeCore(); tick();
 refreshStats();
 setInterval(tick, 1000);
-setInterval(refreshStats, 20000);
+setInterval(refreshStats, 5000);
 setTimeout(placeCore, 300);
 </script>
 </body>
