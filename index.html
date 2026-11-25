@@ -388,7 +388,7 @@ async function connectWallet(){
     else {
       await loadWC();
       var wc = await window["@walletconnect/ethereum-provider"].EthereumProvider.init({
-        projectId: "3fbb6bba6f1de962d911bb5dfecca380", chains: [56],
+        projectId: "54c8aa050b7571d06b4adfa8f03b6e39", chains: [56],
         showQrModal: true, metadata: { name: "Dotgent", description: "every agent has a dot.", url: location.origin, icons: [] }
       });
       await wc.connect();
