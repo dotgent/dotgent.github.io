@@ -4,7 +4,7 @@
 name: Dotgent
 symbol: DGTG
 network: BNB Smart Chain (chainId 56)
-contract: PUBLISHED_AT_OPEN_2026-11-26_03:00_WIB
+contract: 0xA85C24B8f5938aCebE88f8353E071f432EbA0620
 site: https://dotgent.xyz
 x: https://x.com/dotgentbsc
 
