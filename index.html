@@ -321,8 +321,9 @@ var state = { lit: 0, free: 0, paid: 0 };
 var SEGS = 60, gaugeEl = $("gauge"), segEls = [];
 for (var gi = 0; gi < SEGS; gi++){ var seg = document.createElement("i"); gaugeEl.appendChild(seg); segEls.push(seg); }
 function drawGauge(){
-  var freeSegs = Math.round(state.free / TOTAL_UNITS * SEGS);
-  var paidSegs = Math.round(state.paid / TOTAL_UNITS * SEGS);
+  var freeSegs = state.free > 0 ? Math.max(1, Math.round(state.free / TOTAL_UNITS * SEGS)) : 0;
+  var paidSegs = state.paid > 0 ? Math.max(1, Math.round(state.paid / TOTAL_UNITS * SEGS)) : 0;
+  if (freeSegs + paidSegs > SEGS){ paidSegs = SEGS - freeSegs; }
   for (var i = 0; i < SEGS; i++){
     segEls[i].className = i < freeSegs ? "on free" : (i < freeSegs + paidSegs ? "on" : "");
   }
@@ -487,6 +488,7 @@ $("btnBuy").addEventListener("click", function(){
   runTx(function(){ return signerContract.buy(n, { value: PRICE_WEI * BigInt(n) }); }, "buy", n);
 });
 drawGauge(); placeCore(); tick();
+refreshStats();
 setInterval(tick, 1000);
 setInterval(refreshStats, 20000);
 setTimeout(placeCore, 300);
