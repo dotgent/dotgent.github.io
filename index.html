@@ -135,6 +135,9 @@
   }
   .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
   .btn-buy{width:100%;margin-top:12px;padding:15px;font-size:17px;background:var(--orange);color:#fff;letter-spacing:.03em}
+  .btn-connect{width:100%;margin-top:12px;padding:14px;font-size:16px;background:var(--ink);color:#fff}
+  .btn-buy:disabled{opacity:.45;cursor:not-allowed;box-shadow:2px 2px 0 var(--ink)}
+  .buy-or{text-align:center;margin-top:12px;font-size:12.5px;font-weight:700;color:#8A7658}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .chipbtn{
     font-family:"Space Mono",monospace;font-weight:700;font-size:13.5px;cursor:pointer;
@@ -284,6 +287,9 @@
           <button type="button" class="chipbtn" data-amt="0.0008">0.0008</button>
         </div>
         <div class="quote" id="quoteLine">Enter an amount to see how much $DGTG you get.</div>
+        <button class="btn btn-connect" id="connectBtn" type="button">CONNECT WALLET</button>
+        <button class="btn btn-buy" id="buyBtn" type="button" disabled>BUY $DGTG</button>
+        <div class="buy-or">— or —</div>
         <a class="btn btn-buy" href="https://ponsfamily.com/launchpad/0x8193aD27443Fde06589987d8c668C0AD92185F4A" target="_blank" rel="noopener" style="display:block;text-decoration:none">BUY $DGTG ON PONS</a>
         <div class="buy-note" id="buyNote">Trading is LIVE on the Pons curve — tap the button and buy on the launchpad, straight from your wallet.</div>
       </div>
@@ -590,6 +596,179 @@
   });
 
   refreshQuote();
+</script>
+<script>
+  // ---------- on-site buy (fresh build) ----------
+  // Rules baked in from the first attempt's failures:
+  // - ONE WalletConnect provider for the whole page; init once, and
+  //   await connect() before any request.
+  // - Session proposal: chains [1] (universal) + optionalChains [4663].
+  //   Offering 4663 alone gets rejected by wallets that don't know it;
+  //   offering only big chains lets wallets drop 4663 from the session.
+  // - NEVER disconnect/reset a session mid-flow. Wrong network is fixed
+  //   by wallet_switchEthereumChain — that request is what pops the
+  //   approval inside the wallet app — with addEthereumChain on 4902.
+  var isWC = false;
+  var wcProvider = null;
+  function loadWC() {
+    return new Promise(function (resolve, reject) {
+      if (window['@walletconnect/ethereum-provider']) return resolve();
+      var urls = [
+        'wc-provider.js',
+        'https://unpkg.com/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js',
+        'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js'
+      ];
+      var i = 0;
+      function next() {
+        if (i >= urls.length) return reject(new Error('wc load failed'));
+        var s = document.createElement('script');
+        s.src = urls[i++];
+        s.onload = function () { resolve(); };
+        s.onerror = next;
+        document.head.appendChild(s);
+      }
+      next();
+    });
+  }
+  function getWC() {
+    if (wcProvider) return Promise.resolve(wcProvider);
+    return loadWC().then(function () {
+      return window['@walletconnect/ethereum-provider'].EthereumProvider.init({
+        projectId: WC_PROJECT_ID,
+        chains: [1],
+        optionalChains: [4663],
+        showQrModal: true,
+        metadata: { name: 'Dotgent', description: 'Dotgent (DGTG) on Robinhood Chain', url: 'https://dotgent.xyz', icons: ['https://dotgent.xyz/mascot.webp'] }
+      });
+    }).then(function (wc) { wcProvider = wc; return wc; });
+  }
+  function switchToRH(p) {
+    return p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] })
+      .catch(function (err) {
+        if (err && err.code === 4902) {
+          return p.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: CHAIN_ID_HEX, chainName: 'Robinhood Chain',
+              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+              rpcUrls: [RPC], blockExplorerUrls: ['https://robinhoodchain.blockscout.com']
+            }]
+          });
+        }
+        throw err;
+      });
+  }
+  function showConnected() {
+    $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
+    $('buyBtn').disabled = false;
+    return provider.request({ method: 'eth_chainId' }).then(function (cid) {
+      if (cid === CHAIN_ID_HEX) {
+        return tokenBalance(account).then(function (bal) {
+          $('buyNote').textContent = 'Connected on Robinhood Chain. Your balance: ' + fmtNum(bal) + ' $DGTG.';
+        });
+      }
+      $('buyNote').textContent = 'Connected, but not on Robinhood Chain — tap BUY and approve the switch in your wallet app.';
+    }).catch(function () {});
+  }
+  function startConnect() {
+    $('connectBtn').textContent = 'CONNECTING…';
+    $('buyNote').textContent = 'Approve the connection inside your wallet app, then come back to this tab.';
+    var chain;
+    if (window.ethereum) {
+      isWC = false;
+      provider = window.ethereum;
+      chain = provider.request({ method: 'eth_requestAccounts' }).then(function (accs) { account = accs[0]; });
+    } else {
+      isWC = true;
+      chain = getWC().then(function (wc) {
+        provider = wc;
+        return wc.connect(); // required before any request on this provider
+      }).then(function () {
+        return provider.request({ method: 'eth_accounts' });
+      }).then(function (accs) {
+        account = (accs && accs[0]) || (provider.accounts && provider.accounts[0]);
+        if (!account) throw new Error('no account');
+      });
+    }
+    return chain.then(function () { return showConnected(); }).catch(function () {
+      $('connectBtn').textContent = 'CONNECT WALLET';
+      $('buyNote').textContent = 'Connect was cancelled or failed — try again. Opening this page inside your wallet app\'s own browser works best.';
+    });
+  }
+  $('connectBtn').addEventListener('click', function () {
+    if (account) { showConnected(); return; }
+    startConnect();
+  });
+  $('buyBtn').addEventListener('click', function () {
+    if (!account || !provider) { startConnect(); return; }
+    var wei = parseEth($('buyAmount').value);
+    if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
+    $('buyBtn').disabled = true;
+    $('buyBtn').textContent = 'CHECKING…';
+    provider.request({ method: 'eth_chainId' }).then(function (cid) {
+      if (cid === CHAIN_ID_HEX) return cid;
+      $('buyNote').textContent = 'Asking your wallet to switch to Robinhood Chain — approve it in your wallet app.';
+      return switchToRH(provider).then(function () {
+        return provider.request({ method: 'eth_chainId' });
+      });
+    }).then(function (cid) {
+      if (cid !== CHAIN_ID_HEX) {
+        $('buyNote').textContent = 'Still on the wrong network — switch to Robinhood Chain in your wallet, then tap BUY again.';
+        $('buyBtn').disabled = false;
+        $('buyBtn').textContent = 'BUY $DGTG';
+        return 'WRONGCHAIN';
+      }
+      return quoteBuy(wei, account);
+    }).then(function (out) {
+      if (out === 'WRONGCHAIN' || out === undefined) return;
+      if (out === null) {
+        $('buyNote').textContent = 'That amount is over the curve\'s single-buy cap right now — lower it and try again.';
+        $('buyBtn').disabled = false;
+        $('buyBtn').textContent = 'BUY $DGTG';
+        return;
+      }
+      var minOut = out * 95n / 100n;
+      $('buyBtn').textContent = 'CONFIRM IN WALLET…';
+      return provider.request({
+        method: 'eth_sendTransaction',
+        params: [{ from: account, to: CURVE, value: '0x' + wei.toString(16), data: encodeBuy(wei, minOut, account) }]
+      }).then(function (hash) {
+        $('buyBtn').textContent = 'PENDING…';
+        $('buyNote').textContent = 'Sent! Waiting for the chain to confirm…';
+        var tries = 0;
+        (function poll() {
+          tries++;
+          provider.request({ method: 'eth_getTransactionReceipt', params: [hash] })
+            .then(function (r) { return { result: r }; })
+            .catch(function () { return rpc('eth_getTransactionReceipt', [hash]); })
+            .then(function (res) {
+              if (res.result) {
+                if (res.result.status === '0x1') {
+                  $('buyNote').textContent = 'Done — the $DGTG is in your wallet. Welcome to the dots 🟠';
+                  tokenBalance(account).then(function (bal) {
+                    $('quoteLine').innerHTML = 'Your balance: ' + fmtNum(bal) + ' $DGTG';
+                  });
+                } else {
+                  $('buyNote').textContent = 'The transaction failed on-chain — no tokens moved. Try a smaller amount.';
+                }
+                $('buyBtn').textContent = 'BUY $DGTG';
+                $('buyBtn').disabled = false;
+              } else if (tries < 40) {
+                setTimeout(poll, 1500);
+              } else {
+                $('buyNote').textContent = 'Still pending — check your wallet activity in a bit.';
+                $('buyBtn').textContent = 'BUY $DGTG';
+                $('buyBtn').disabled = false;
+              }
+            });
+        })();
+      });
+    }).catch(function () {
+      $('buyNote').textContent = 'Buy cancelled in the wallet, or it failed — nothing was spent.';
+      $('buyBtn').textContent = 'BUY $DGTG';
+      $('buyBtn').disabled = false;
+    });
+  });
 </script>
 <script>
   // hero dot field: tiny dots drifting up, twinkling
