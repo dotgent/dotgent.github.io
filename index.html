@@ -462,6 +462,7 @@
     return new Promise(function (resolve, reject) {
       if (window['@walletconnect/ethereum-provider']) return resolve();
       var urls = [
+        'wc-provider.js',
         'https://unpkg.com/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js',
         'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js'
       ];
@@ -507,6 +508,7 @@
   $('connectBtn').addEventListener('click', function () {
     if (account) return;
     $('connectBtn').textContent = 'CONNECTING…';
+    $('buyNote').textContent = 'Pick your wallet in the popup and approve inside your wallet app — then come back to this tab. Don\'t close the popup early.';
     var getProvider;
     if (window.ethereum) {
       provider = window.ethereum;
