@@ -515,6 +515,23 @@
   }
   var isWC = false;
   var chainOk = false;
+  var wcProvider = null; // ONE WalletConnect provider per page — calling
+  // init() again (or disconnecting mid-flow) breaks its modal and session.
+  function getWCProvider() {
+    if (wcProvider) return Promise.resolve(wcProvider);
+    return loadWC().then(function () {
+      return window['@walletconnect/ethereum-provider'].EthereumProvider.init({
+        projectId: WC_PROJECT_ID,
+        // 1 is the required chain (every wallet supports it); Robinhood
+        // Chain rides along as optional so the session can switch to it.
+        // Offering 4663 as the ONLY chain gets the whole session proposal
+        // rejected by wallets that don't list it.
+        chains: [1], optionalChains: [4663],
+        showQrModal: true,
+        metadata: { name: 'Dotgent', description: 'Dotgent (DGTG) on Robinhood Chain', url: 'https://dotgent.xyz', icons: ['https://dotgent.xyz/mascot.webp'] }
+      });
+    }).then(function (wc) { wcProvider = wc; return wc; });
+  }
   function afterConnect() {
     $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
     $('buyBtn').disabled = false;
@@ -522,7 +539,7 @@
       chainOk = (cid === CHAIN_ID_HEX);
       if (!chainOk) {
         $('buyNote').textContent = isWC
-          ? 'Connected on the wrong network — tap your address button above to reconnect on Robinhood Chain.'
+          ? 'Connected on the wrong network — tap your address button above and approve the switch in your wallet app.'
           : 'Connected, but your wallet is not on Robinhood Chain yet — switch its network to Robinhood Chain, then tap BUY.';
         return;
       }
@@ -532,7 +549,7 @@
     }).catch(function () {});
     refreshQuote();
   }
-  function startConnect(retried) {
+  function startConnect() {
     $('connectBtn').textContent = 'CONNECTING…';
     $('buyNote').textContent = 'Pick your wallet in the popup and approve inside your wallet app — then come back to this tab. Don\'t close the popup early.';
     var getProvider;
@@ -542,12 +559,7 @@
       getProvider = Promise.resolve(provider);
     } else {
       isWC = true;
-      getProvider = loadWC().then(function () {
-        return window['@walletconnect/ethereum-provider'].EthereumProvider.init({
-          projectId: WC_PROJECT_ID, chains: [4663], showQrModal: true,
-          metadata: { name: 'Dotgent', description: 'Dotgent (DGTG) on Robinhood Chain', url: 'https://dotgent.xyz', icons: ['https://dotgent.xyz/mascot.webp'] }
-        });
-      }).then(function (wc) {
+      getProvider = getWCProvider().then(function (wc) {
         provider = wc;
         return wc.connect().then(function () { return wc; });
       });
@@ -557,21 +569,12 @@
       // that arrives before the site is approved.
       return p.request({ method: 'eth_requestAccounts' }).then(function (accs) {
         account = accs[0];
-        return p.request({ method: 'eth_chainId' });
-      }).then(function (cid) {
-        if (cid === CHAIN_ID_HEX) { chainOk = true; return; }
-        chainOk = false;
-        if (isWC && !retried) {
-          // A restored WalletConnect session can be stuck on the wrong
-          // network and silently swallows switch requests — kill it and
-          // force a fresh approval that only offers Robinhood Chain.
-          account = null;
-          var old = provider; provider = null;
-          $('buyNote').textContent = 'Re-opening the wallet approval on the right network — approve it in your wallet app.';
-          var kill = (old && old.disconnect) ? old.disconnect().catch(function () {}) : Promise.resolve();
-          return kill.then(function () { startConnect(true); });
-        }
-        return ensureChain(p).catch(function () {});
+        // One polite switch attempt — the wallet shows its own approval
+        // popup for it. Never disconnect or re-init here: that is what
+        // used to kill the flow.
+        return ensureChain(p).catch(function () {}).then(function () {
+          return p.request({ method: 'eth_chainId' });
+        }).then(function (cid) { chainOk = (cid === CHAIN_ID_HEX); });
       });
     }).then(function () {
       if (account) afterConnect();
@@ -582,17 +585,25 @@
   }
   $('connectBtn').addEventListener('click', function () {
     if (account && chainOk) return;
-    if (account && !chainOk && isWC && provider) {
-      // Wrong-network WalletConnect session: drop it and reconnect fresh —
-      // the fresh approval is what pops up in the wallet app.
-      var old = provider; provider = null; account = null; chainOk = false;
-      $('connectBtn').textContent = 'CONNECT WALLET';
-      if (old.disconnect) old.disconnect().catch(function () {});
-      startConnect(true);
+    if (account && provider) {
+      // Connected but on the wrong network: re-send the switch request —
+      // this is the request that pops up in the wallet app for approval.
+      $('buyNote').textContent = 'Asking your wallet to switch to Robinhood Chain — approve it in your wallet app.';
+      ensureChain(provider).then(function () {
+        return provider.request({ method: 'eth_chainId' });
+      }).then(function (cid) {
+        chainOk = (cid === CHAIN_ID_HEX);
+        if (chainOk) {
+          afterConnect();
+        } else {
+          $('buyNote').textContent = 'Still on the wrong network — if your wallet cannot switch to Robinhood Chain from here, open dotgent.xyz inside your wallet app\'s own browser instead.';
+        }
+      }).catch(function () {
+        $('buyNote').textContent = 'The switch was not approved — if your wallet cannot switch to Robinhood Chain from here, open dotgent.xyz inside your wallet app\'s own browser instead.';
+      });
       return;
     }
-    if (account) return;
-    startConnect(false);
+    startConnect();
   });
 
   $('buyBtn').addEventListener('click', function () {
@@ -606,7 +617,7 @@
     }).then(function (cid) {
       if (cid !== CHAIN_ID_HEX) {
         $('buyNote').textContent = isWC
-          ? 'Your wallet session is on the wrong network — tap your address button above to reconnect on Robinhood Chain, then BUY.'
+          ? 'Your wallet is still on the wrong network — tap your address button above and approve the switch in your wallet app, then BUY.'
           : 'Your wallet is not on Robinhood Chain — switch the network in your wallet first, then tap BUY again.';
         $('buyBtn').disabled = false;
         $('buyBtn').textContent = 'BUY $DGTG';
