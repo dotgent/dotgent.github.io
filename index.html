@@ -536,11 +536,15 @@
       });
     }
     getProvider.then(function (p) {
-      return ensureChain(p).then(function () {
-        return p.request({ method: 'eth_requestAccounts' });
+      // accounts FIRST — several wallet browsers reject a chain switch
+      // that arrives before the site is approved.
+      return p.request({ method: 'eth_requestAccounts' }).then(function (accs) {
+        account = accs[0];
+        return ensureChain(p).catch(function () {
+          $('buyNote').textContent = 'Connected, but the wallet is not on Robinhood Chain yet — switch the network in your wallet, then tap BUY.';
+        });
       });
-    }).then(function (accs) {
-      account = accs[0];
+    }).then(function () {
       afterConnect();
     }).catch(function (err) {
       $('connectBtn').textContent = 'CONNECT WALLET';
@@ -554,7 +558,18 @@
     if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
     $('buyBtn').disabled = true;
     $('buyBtn').textContent = 'CHECKING…';
-    quoteBuy(wei, account).then(function (out) {
+    ensureChain(provider).catch(function () {}).then(function () {
+      return provider.request({ method: 'eth_chainId' });
+    }).then(function (cid) {
+      if (cid !== CHAIN_ID_HEX) {
+        $('buyNote').textContent = 'Your wallet is not on Robinhood Chain — switch the network in your wallet first, then tap BUY again.';
+        $('buyBtn').disabled = false;
+        $('buyBtn').textContent = 'BUY $DGTG';
+        return 'WRONGCHAIN';
+      }
+      return quoteBuy(wei, account);
+    }).then(function (out) {
+      if (out === 'WRONGCHAIN') return;
       if (out === null) {
         $('buyNote').textContent = 'That amount is over the curve\'s single-buy cap right now — lower it and try again.';
         $('buyBtn').disabled = false;
