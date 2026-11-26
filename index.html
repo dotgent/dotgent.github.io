@@ -194,6 +194,20 @@
     padding:9px 15px;border-radius:999px;border:2.5px solid var(--ink);color:var(--ink);background:#fff;
   }
   .tpl-actions a{background:var(--orange);color:#fff}
+  /* inline verify field in the rail (step 3) */
+  .task .txt .verify-inline{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .verify-inline input{
+    flex:1 1 200px;font-family:inherit;font-size:15px;font-weight:700;
+    padding:13px 15px;border-radius:999px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
+  }
+  .verify-inline button{
+    font-family:inherit;font-weight:900;font-size:15px;cursor:pointer;
+    padding:13px 20px;border-radius:999px;border:3px solid var(--ink);
+    background:var(--orange);color:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.55);
+  }
+  .task .txt .wallet-msg{display:block;color:#EBDCC2}
+  .task .txt .wallet-msg.ok{color:#4ADE80}
+  .task .txt .wallet-msg.err{color:#FF9A7A}
   /* ---------- CA band ---------- */
   .ca-band{
     margin-top:34px;background:var(--ink);color:var(--paper);
@@ -271,25 +285,21 @@
       </a>
       <div class="task">
         <span class="num" id="tplNum">3</span>
-        <span class="txt"><strong>Post the template</strong><span>Your own post — one tap, the text is already filled in:</span>
+        <span class="txt">
           <span class="tpl-actions">
             <a id="postTplBtn" href="#" target="_blank" rel="noopener">POST IT ON X →</a>
           </span>
+          <form id="proofForm" class="verify-inline">
+            <input type="text" id="proofInput" placeholder="https://x.com/you/status/…" autocomplete="off" spellcheck="false">
+            <button type="submit" id="proofBtn">VERIFY</button>
+          </form>
+          <span class="wallet-msg" id="proofMsg"></span>
         </span>
       </div>
       <div class="task">
         <span class="num">4</span>
-        <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies below. That's your ticket.</span></span>
+        <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies. That's your ticket.</span></span>
       </div>
-    </div>
-    <div class="wallet-form">
-      <strong>VERIFY YOUR POST</strong>
-      <p>Paste the link to your own post from step 3. We read the post and check the template is really in it — the wallet field below unlocks only when it checks out.</p>
-      <form id="proofForm">
-        <input type="text" id="proofInput" placeholder="https://x.com/you/status/…" autocomplete="off" spellcheck="false">
-        <button type="submit" id="proofBtn">VERIFY</button>
-      </form>
-      <div class="wallet-msg" id="proofMsg"></div>
     </div>
     <div class="wallet-form locked" id="walletBox">
       <strong>YOUR EVM WALLET <span id="lockTag">🔒 LOCKED</span></strong>
