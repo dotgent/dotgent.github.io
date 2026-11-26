@@ -284,12 +284,8 @@ CA: 0x8193aD27443Fde06589987d8c668C0AD92185F4A
         </span>
       </div>
       <div class="task">
-        <span class="num" id="verifyNum">4</span>
-        <span class="txt"><strong>Verify your post</strong><span>Paste the link to YOUR post below — we read it and check the template is really in it.</span></span>
-      </div>
-      <div class="task">
-        <span class="num">5</span>
-        <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies. That's your ticket.</span></span>
+        <span class="num">4</span>
+        <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies below. That's your ticket.</span></span>
       </div>
     </div>
     <div class="wallet-form">
@@ -389,7 +385,6 @@ CA: 0x8193aD27443Fde06589987d8c668C0AD92185F4A
         verifiedPost = v;
         msg.className = 'wallet-msg ok';
         msg.textContent = 'Post verified — the template is in it. Wallet field unlocked below.';
-        markDone('verifyNum');
         var box = document.getElementById('walletBox');
         box.classList.remove('locked');
         document.getElementById('walletInput').disabled = false;
