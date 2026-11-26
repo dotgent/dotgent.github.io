@@ -494,21 +494,31 @@
       next();
     });
   }
+  function addChain(p) {
+    return p.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: CHAIN_ID_HEX, chainName: 'Robinhood Chain',
+        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+        rpcUrls: [RPC], blockExplorerUrls: ['https://robinhoodchain.blockscout.com']
+      }]
+    });
+  }
   function ensureChain(p) {
     return p.request({ method: 'eth_chainId' }).then(function (cid) {
       if (cid === CHAIN_ID_HEX) return;
+      if (isWC) {
+        // Over WalletConnect, a switch request for a chain outside the
+        // approved session opens the wallet app with NO prompt at all.
+        // Adding the chain is the request that actually gets a UI there —
+        // it extends the session and switches in one step.
+        return addChain(p).catch(function () {
+          return p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] });
+        });
+      }
       return p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] })
         .catch(function (err) {
-          if (err && err.code === 4902) {
-            return p.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: CHAIN_ID_HEX, chainName: 'Robinhood Chain',
-                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-                rpcUrls: [RPC], blockExplorerUrls: ['https://robinhoodchain.blockscout.com']
-              }]
-            });
-          }
+          if (err && err.code === 4902) return addChain(p);
           throw err;
         });
     });
