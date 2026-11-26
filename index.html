@@ -451,7 +451,7 @@
           if (r) {
             $('quoteLine').innerHTML = 'That\'s over the curve\'s single-buy cap right now.<small>Max one buy ≈ ' + (Number(r.maxWei) / 1e18).toString() + ' ETH (≈ ' + fmtNum(r.out) + ' $DGTG). Split it into smaller buys.</small>';
           } else {
-            $('quoteLine').textContent = 'The curve didn\'t answer — try a smaller amount.';
+            $('quoteLine').textContent = 'Couldn\'t load the price — connect your wallet first, or check your connection and try again.';
           }
         });
       }
