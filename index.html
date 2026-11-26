@@ -287,7 +287,7 @@
           <button type="button" class="chipbtn" data-amt="0.0008">0.0008</button>
         </div>
         <button class="btn btn-connect" id="connectBtn" type="button">CONNECT WALLET</button>
-        <button class="btn btn-buy" id="buyBtn" type="button" disabled>BUY $DGTG</button>
+        <button class="btn btn-buy" id="buyBtn" type="button">BUY $DGTG</button>
         <div class="buy-or">— or —</div>
         <a class="btn btn-buy" href="https://ponsfamily.com/launchpad/0x8193aD27443Fde06589987d8c668C0AD92185F4A" target="_blank" rel="noopener" style="display:block;text-decoration:none">BUY $DGTG ON PONS</a>
         <div class="buy-note" id="buyNote">Trading is LIVE on the Pons curve — tap the button and buy on the launchpad, straight from your wallet.</div>
@@ -597,8 +597,9 @@
     return loadWC().then(function () {
       return window['@walletconnect/ethereum-provider'].EthereumProvider.init({
         projectId: WC_PROJECT_ID,
-        chains: [1],
-        optionalChains: [4663],
+        chains: [4663],
+        rpcMap: { 4663: RPC },
+        disableProviderPing: true,
         showQrModal: true,
         metadata: { name: 'Dotgent', description: 'Dotgent (DGTG) on Robinhood Chain', url: 'https://dotgent.xyz', icons: ['https://dotgent.xyz/mascot.webp'] }
       });
@@ -621,6 +622,15 @@
         throw err;
       });
   }
+  function cidEq(cid) {
+    // The WalletConnect provider answers eth_chainId with the NUMBER
+    // 4663, not the hex string — compare loosely or every chain check
+    // fails while the wallet is in fact on Robinhood Chain. (Proven
+    // with a real WC session + real buy on 2026-11-27.)
+    if (typeof cid === 'number') return cid === 4663;
+    if (typeof cid === 'string') return cid.toLowerCase() === CHAIN_ID_HEX;
+    return false;
+  }
   function connect() {
     $('connectBtn').textContent = 'CONNECTING…';
     $('buyNote').textContent = 'Approve the connection in your wallet.';
@@ -642,22 +652,27 @@
       });
     }
     return getP.then(function () {
+      // Unlock FIRST. The network switch and balance below are only
+      // follow-ups — if any of their reads stalls inside the wallet,
+      // the buttons must already work. (A stalled read here is what
+      // left BUY dead on the owner's phone.)
+      $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
+      $('buyBtn').disabled = false;
+      $('buyNote').textContent = 'Connected.';
       return provider.request({ method: 'eth_chainId' });
     }).then(function (cid) {
-      if (cid !== CHAIN_ID_HEX) return switchChain(provider); // switch right away, as part of connecting
+      if (!cidEq(cid)) return switchChain(provider); // switch right away, as part of connecting
     }).then(function () {
       return provider.request({ method: 'eth_chainId' });
     }).then(function (cid) {
-      if (cid === CHAIN_ID_HEX) return cid;
+      if (cidEq(cid)) return cid;
       // Some wallets resolve the switch a beat before the new chain is
       // readable — one short second look before calling it wrong.
       return new Promise(function (res) { setTimeout(res, 800); }).then(function () {
         return provider.request({ method: 'eth_chainId' });
       });
     }).then(function (cid) {
-      $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
-      $('buyBtn').disabled = false;
-      if (cid !== CHAIN_ID_HEX) {
+      if (!cidEq(cid)) {
         $('buyNote').textContent = 'Connected, but not on Robinhood Chain — switch the network in your wallet, then tap BUY.';
         return;
       }
@@ -665,10 +680,17 @@
         $('buyNote').textContent = 'Connected on Robinhood Chain. Your balance: ' + fmtNum(bal) + ' $DGTG.';
       }).catch(function () {});
     }).catch(function () {
-      $('connectBtn').textContent = 'CONNECT WALLET';
-      $('buyNote').textContent = 'Connect was cancelled — try again.';
+      if (!account) {
+        $('connectBtn').textContent = 'CONNECT WALLET';
+        $('buyNote').textContent = 'Connect was cancelled — try again.';
+      }
+      // With an account set, a follow-up read failed — buttons stay live.
     });
   }
+  // Start the WalletConnect provider at page load, not on the click —
+  // its init/relay warm-up is the flaky part; the click should only
+  // have the session left to do.
+  getWC().catch(function () {});
   $('connectBtn').addEventListener('click', function () {
     if (account) return;
     connect();
@@ -679,13 +701,17 @@
     if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
     $('buyBtn').disabled = true;
     $('buyBtn').textContent = 'CONFIRM IN WALLET…';
-    provider.request({ method: 'eth_chainId' }).then(function (cid) {
-      if (cid === CHAIN_ID_HEX) return cid;
+    var firstRead = Promise.race([
+      provider.request({ method: 'eth_chainId' }),
+      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('chain timeout')); }, 6000); })
+    ]);
+    firstRead.then(function (cid) {
+      if (cidEq(cid)) return cid;
       return switchChain(provider).then(function () {
         return provider.request({ method: 'eth_chainId' });
       });
     }).then(function (cid) {
-      if (cid !== CHAIN_ID_HEX) throw new Error('wrong chain');
+      if (!cidEq(cid)) throw new Error('wrong chain');
       // No price check anywhere in the buy: the visitor picks an ETH
       // amount and buys at the curve's live price (minOut 0).
       return provider.request({
@@ -724,7 +750,9 @@
     }).catch(function (err) {
       $('buyNote').textContent = (err && err.message === 'wrong chain')
         ? 'Your wallet is not on Robinhood Chain — switch the network in your wallet, then tap BUY.'
-        : 'Buy cancelled in the wallet, or it failed — nothing was spent.';
+        : (err && err.message === 'chain timeout')
+          ? 'Could not reach your wallet — open it, make sure it is on Robinhood Chain, then tap BUY again.'
+          : 'Buy cancelled in the wallet, or it failed — nothing was spent.';
       $('buyBtn').textContent = 'BUY $DGTG';
       $('buyBtn').disabled = false;
     });
