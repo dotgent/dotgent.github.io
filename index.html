@@ -182,6 +182,18 @@
   .wallet-form.locked input,.wallet-form.locked button{cursor:not-allowed}
   #lockTag{font-size:12px;letter-spacing:.1em;color:#C62F0E}
   #lockTag.open{color:#0B7A55}
+  /* giveaway template box */
+  .task .txt .tpl-box{
+    display:block;margin-top:10px;background:var(--paper);color:var(--ink);
+    border-radius:14px;padding:13px 14px;font-size:14px;line-height:1.55;font-weight:700;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .task .txt .tpl-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .tpl-actions button,.tpl-actions a{
+    font-family:inherit;font-weight:900;font-size:13px;cursor:pointer;text-decoration:none;
+    padding:9px 15px;border-radius:999px;border:2.5px solid var(--ink);color:var(--ink);background:#fff;
+  }
+  .tpl-actions a{background:var(--orange);color:#fff}
   /* ---------- CA band ---------- */
   .ca-band{
     margin-top:34px;background:var(--ink);color:var(--paper);
@@ -245,34 +257,47 @@
   <!-- GIVEAWAY PANEL -->
   <section class="panel panel-give" id="giveaway">
     <h2>LAUNCH GIVEAWAY <span class="tag">FREE $DGTG</span></h2>
-    <p>Three taps on X, one wallet address below — you're in the draw. Winners are picked from all entries after launch.</p>
+    <p>Like, repost, post the template — then verify your post below and drop your wallet. Winners are picked from all verified entries after launch.</p>
     <div class="rail">
-      <a class="task" href="https://x.com/intent/follow?screen_name=dotgent_" target="_blank" rel="noopener">
-        <span class="num">1</span>
-        <span class="txt"><strong>Follow @dotgent_</strong><span>Opens our X page — hit Follow there.</span></span>
-        <span class="open">OPEN →</span>
-      </a>
       <a class="task" href="https://x.com/intent/like?tweet_id=2125983869853995405" target="_blank" rel="noopener">
-        <span class="num">2</span>
-        <span class="txt"><strong>Like the giveaway post</strong><span>Opens the post — drop a like on it.</span></span>
+        <span class="num">1</span>
+        <span class="txt"><strong>Like the launch post</strong><span>Opens the post — drop a like on it.</span></span>
         <span class="open">OPEN →</span>
       </a>
       <a class="task" href="https://x.com/intent/retweet?tweet_id=2125983869853995405" target="_blank" rel="noopener">
-        <span class="num">3</span>
+        <span class="num">2</span>
         <span class="txt"><strong>Repost it</strong><span>Same post — hit Repost so the dot travels.</span></span>
         <span class="open">OPEN →</span>
       </a>
       <div class="task">
-        <span class="num">4</span>
-        <span class="txt"><strong>Drop your EVM wallet</strong><span>Paste your repost link below — the wallet field unlocks, then drop your address. That's your ticket.</span></span>
+        <span class="num" id="tplNum">3</span>
+        <span class="txt"><strong>Post the template</strong><span>Your own post, with this exact text:</span>
+          <span class="tpl-box" id="tplText">I just joined the $DGTG giveaway 🚀
+Dotgent is LIVE on Pons — Robinhood Chain!
+Join here 👉 dotgent.xyz
+CA: 0x8193aD27443Fde06589987d8c668C0AD92185F4A
+#DGTG #RobinhoodChain</span>
+          <span class="tpl-actions">
+            <button type="button" id="copyTplBtn">COPY TEMPLATE</button>
+            <a id="postTplBtn" href="#" target="_blank" rel="noopener">POST IT ON X →</a>
+          </span>
+        </span>
+      </div>
+      <div class="task">
+        <span class="num" id="verifyNum">4</span>
+        <span class="txt"><strong>Verify your post</strong><span>Paste the link to YOUR post below — we read it and check the template is really in it.</span></span>
+      </div>
+      <div class="task">
+        <span class="num">5</span>
+        <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies. That's your ticket.</span></span>
       </div>
     </div>
     <div class="wallet-form">
-      <strong>PROVE YOUR REPOST</strong>
-      <p>Paste the link to your repost of the giveaway post. The wallet field below stays locked until a valid X post link is in.</p>
+      <strong>VERIFY YOUR POST</strong>
+      <p>Paste the link to your own post from step 3. We read the post and check the template is really in it — the wallet field below unlocks only when it checks out.</p>
       <form id="proofForm">
         <input type="text" id="proofInput" placeholder="https://x.com/you/status/…" autocomplete="off" spellcheck="false">
-        <button type="submit">UNLOCK</button>
+        <button type="submit" id="proofBtn">VERIFY</button>
       </form>
       <div class="wallet-msg" id="proofMsg"></div>
     </div>
@@ -310,26 +335,79 @@
     });
   });
 
-  // proof-of-repost gate: wallet field stays locked until a valid X post link is submitted
+  // ---------- giveaway: template post + verified-post gate ----------
+  var tplText = document.getElementById('tplText').textContent.trim();
+  document.getElementById('postTplBtn').href =
+    'https://x.com/intent/post?text=' + encodeURIComponent(tplText);
+  function markDone(id) {
+    var n = document.getElementById(id);
+    if (n) { n.textContent = '✓'; n.style.background = '#0B7A55'; n.style.borderColor = '#0B7A55'; }
+  }
+  document.getElementById('copyTplBtn').addEventListener('click', function () {
+    var btn = this;
+    function done() { btn.textContent = 'COPIED ✓'; setTimeout(function () { btn.textContent = 'COPY TEMPLATE'; }, 2000); }
+    function fallback() {
+      var ta = document.createElement('textarea');
+      ta.value = tplText; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(tplText).then(done).catch(fallback);
+    } else { fallback(); }
+  });
+  document.getElementById('postTplBtn').addEventListener('click', function () { markDone('tplNum'); });
+
+  // verify gate: the server reads the visitor's post and checks the template
+  // is really in it — the wallet field unlocks only on a verified post.
+  var verifiedPost = '';
+  function reasonText(r) {
+    if (r === 'incomplete') return 'That post doesn\'t carry the full template — it needs $DGTG and the contract address, word for word from step 3.';
+    if (r === 'not_found') return 'Couldn\'t find that post — check the link and try again.';
+    if (r === 'bad_link') return 'That\'s not an X post link — it looks like https://x.com/you/status/123456…';
+    return 'Couldn\'t reach X to verify just now — try again in a minute.';
+  }
   document.getElementById('proofForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var v = document.getElementById('proofInput').value.trim();
     var msg = document.getElementById('proofMsg');
-    if (/^https:\/\/(x\.com|twitter\.com)\/[^\/\s]+\/status\/\d+/.test(v)) {
-      msg.className = 'wallet-msg ok';
-      msg.textContent = 'Repost link accepted — wallet field unlocked below.';
-      var box = document.getElementById('walletBox');
-      box.classList.remove('locked');
-      document.getElementById('walletInput').disabled = false;
-      document.getElementById('walletBtn').disabled = false;
-      var tag = document.getElementById('lockTag');
-      tag.textContent = '🔓 OPEN';
-      tag.className = 'open';
-      document.getElementById('proofInput').disabled = true;
-    } else {
+    var btn = document.getElementById('proofBtn');
+    if (!/^https:\/\/(x\.com|twitter\.com)\/[^\/\s]+\/status\/\d+/.test(v)) {
       msg.className = 'wallet-msg err';
-      msg.textContent = 'That\'s not an X post link — it looks like https://x.com/you/status/123456…';
+      msg.textContent = reasonText('bad_link');
+      return;
     }
+    btn.disabled = true;
+    msg.className = 'wallet-msg';
+    msg.textContent = 'Reading your post…';
+    fetch('https://dotgent-giveaway.reuniakbarpunk212.workers.dev/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post: v })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.ok) {
+        verifiedPost = v;
+        msg.className = 'wallet-msg ok';
+        msg.textContent = 'Post verified — the template is in it. Wallet field unlocked below.';
+        markDone('verifyNum');
+        var box = document.getElementById('walletBox');
+        box.classList.remove('locked');
+        document.getElementById('walletInput').disabled = false;
+        document.getElementById('walletBtn').disabled = false;
+        var tag = document.getElementById('lockTag');
+        tag.textContent = '🔓 OPEN';
+        tag.className = 'open';
+        document.getElementById('proofInput').disabled = true;
+      } else {
+        msg.className = 'wallet-msg err';
+        msg.textContent = reasonText(d && d.reason);
+        btn.disabled = false;
+      }
+    }).catch(function () {
+      msg.className = 'wallet-msg err';
+      msg.textContent = reasonText('unreachable');
+      btn.disabled = false;
+    });
   });
 
   // wallet form: validate, then STORE the entry on the giveaway worker —
@@ -350,7 +428,7 @@
     fetch('https://dotgent-giveaway.reuniakbarpunk212.workers.dev/enter', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: v, repost: document.getElementById('proofInput').value.trim() })
+      body: JSON.stringify({ wallet: v, post: verifiedPost })
     }).then(function (r) { return r.json(); }).then(function (d) {
       if (d && d.ok) {
         msg.className = 'wallet-msg ok';
