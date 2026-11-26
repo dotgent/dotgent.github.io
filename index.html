@@ -484,10 +484,23 @@
 
   function $(id) { return document.getElementById(id); }
   function rpc(method, params) {
-    return fetch(RPC, {
+    // Hard 10s timeout: in wallet-app browsers a page fetch can hang
+    // forever without rejecting, which silently froze the buy's quote
+    // check. Aborting lets callers fall back to the wallet provider.
+    var ctrl = ('AbortController' in window) ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 10000) : null;
+    var opts = {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
-    }).then(function (r) { return r.json(); });
+    };
+    if (ctrl) opts.signal = ctrl.signal;
+    return fetch(RPC, opts).then(function (r) {
+      if (timer) clearTimeout(timer);
+      return r.json();
+    }).catch(function (e) {
+      if (timer) clearTimeout(timer);
+      throw e;
+    });
   }
   function pad32(big) {
     var h = big.toString(16);
@@ -658,16 +671,18 @@
         throw err;
       });
   }
+  function readChain(p) {
+    // eth_chainId with a 6s cap — a stalled read must never freeze a flow.
+    return Promise.race([
+      p.request({ method: 'eth_chainId' }),
+      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('slow')); }, 6000); })
+    ]);
+  }
   function waitForChain(p, tries) {
     // Poll eth_chainId until Robinhood Chain shows up. Over WalletConnect
     // many wallets apply a network switch but never answer the switch
     // request itself — awaiting it froze the buy on CHECKING forever.
-    function read() {
-      return Promise.race([
-        p.request({ method: 'eth_chainId' }),
-        new Promise(function (_, rej) { setTimeout(function () { rej(new Error('slow')); }, 6000); })
-      ]);
-    }
+    function read() { return readChain(p); }
     return read().then(function (cid) {
       if (cid === CHAIN_ID_HEX) return true;
       if (tries <= 0) return false;
@@ -724,8 +739,9 @@
     if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
     $('buyBtn').disabled = true;
     $('buyBtn').textContent = 'CHECKING…';
-    provider.request({ method: 'eth_chainId' }).then(function (cid) {
+    readChain(provider).catch(function () { return '0x0'; }).then(function (cid) {
       if (cid === CHAIN_ID_HEX) return cid;
+      $('buyBtn').textContent = 'WAITING FOR SWITCH…';
       $('buyNote').textContent = 'Asking your wallet to switch to Robinhood Chain — approve it in your wallet app, then come back to this tab.';
       // Fire-and-forget: never await the switch request (see waitForChain).
       switchToRH(provider).catch(function () {});
@@ -737,6 +753,7 @@
         $('buyBtn').textContent = 'BUY $DGTG';
         return 'WRONGCHAIN';
       }
+      $('buyBtn').textContent = 'CHECKING THE CURVE…';
       return quoteBuy(wei, account);
     }).then(function (out) {
       if (out === 'WRONGCHAIN' || out === undefined) return;
