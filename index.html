@@ -332,19 +332,40 @@
     }
   });
 
-  // wallet form validation
+  // wallet form: validate, then STORE the entry on the giveaway worker —
+  // success is shown only after the entry is actually saved.
   document.getElementById('walletForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var v = document.getElementById('walletInput').value.trim();
     var msg = document.getElementById('walletMsg');
-    if (/^0x[0-9a-fA-F]{40}$/.test(v)) {
-      msg.className = 'wallet-msg ok';
-      msg.textContent = 'You\'re in. This wallet is on the giveaway list — good luck, dot.';
-      document.getElementById('walletInput').value = '';
-    } else {
+    var btn = document.getElementById('walletBtn');
+    if (!/^0x[0-9a-fA-F]{40}$/.test(v)) {
       msg.className = 'wallet-msg err';
       msg.textContent = 'That doesn\'t look like an EVM address — it starts with 0x and has 42 characters.';
+      return;
     }
+    btn.disabled = true;
+    msg.className = 'wallet-msg';
+    msg.textContent = 'Saving your entry…';
+    fetch('https://dotgent-giveaway.reuniakbarpunk212.workers.dev/enter', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: v, repost: document.getElementById('proofInput').value.trim() })
+    }).then(function (r) { return r.json(); }).then(function (d) {
+      if (d && d.ok) {
+        msg.className = 'wallet-msg ok';
+        msg.textContent = d.duplicate
+          ? 'This wallet is already on the giveaway list — entry updated. Good luck, dot.'
+          : 'You\'re in. This wallet is on the giveaway list — good luck, dot.';
+        document.getElementById('walletInput').value = '';
+      } else {
+        msg.className = 'wallet-msg err';
+        msg.textContent = 'That didn\'t save — please try again, and drop your wallet in the X post replies too, just in case.';
+      }
+    }).catch(function () {
+      msg.className = 'wallet-msg err';
+      msg.textContent = 'That didn\'t save — please try again, and drop your wallet in the X post replies too, just in case.';
+    }).finally(function () { btn.disabled = false; });
   });
 
   // ---------- on-site buy: Pons curve, straight from the visitor's wallet ----------
