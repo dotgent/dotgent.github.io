@@ -579,12 +579,26 @@
       // that arrives before the site is approved.
       return p.request({ method: 'eth_requestAccounts' }).then(function (accs) {
         account = accs[0];
-        // One polite switch attempt — the wallet shows its own approval
-        // popup for it. Never disconnect or re-init here: that is what
-        // used to kill the flow.
-        return ensureChain(p).catch(function () {}).then(function () {
-          return p.request({ method: 'eth_chainId' });
-        }).then(function (cid) { chainOk = (cid === CHAIN_ID_HEX); });
+        return p.request({ method: 'eth_chainId' });
+      }).then(function (cid) {
+        chainOk = (cid === CHAIN_ID_HEX);
+        if (!chainOk && isWC) {
+          // The restored session itself sits on the wrong network, and
+          // WalletConnect wallets ignore switch/add requests for chains
+          // outside the session — the ONLY fix is a fresh session. Kill
+          // this one (same provider instance, no re-init) and let the
+          // visitor tap CONNECT again for a fresh approval on 4663.
+          account = null; chainOk = false;
+          $('connectBtn').textContent = 'CONNECT WALLET';
+          $('buyNote').textContent = 'Your saved connection is on the wrong network. Tap CONNECT WALLET and approve the fresh request in your wallet app — it lands on Robinhood Chain this time.';
+          if (p.disconnect) p.disconnect().catch(function () {});
+          return;
+        }
+        if (!chainOk) {
+          return ensureChain(p).catch(function () {}).then(function () {
+            return p.request({ method: 'eth_chainId' });
+          }).then(function (cid2) { chainOk = (cid2 === CHAIN_ID_HEX); });
+        }
       });
     }).then(function () {
       if (account) afterConnect();
@@ -596,8 +610,19 @@
   $('connectBtn').addEventListener('click', function () {
     if (account && chainOk) return;
     if (account && provider) {
-      // Connected but on the wrong network: re-send the switch request —
-      // this is the request that pops up in the wallet app for approval.
+      if (isWC) {
+        // Wrong-network WC session: switch requests go nowhere — reset
+        // the session so the next CONNECT gets a fresh approval on 4663.
+        var stale = provider;
+        account = null; chainOk = false;
+        $('connectBtn').textContent = 'CONNECT WALLET';
+        $('buyBtn').disabled = true;
+        $('buyNote').textContent = 'Your saved connection is on the wrong network. Tap CONNECT WALLET and approve the fresh request in your wallet app — it lands on Robinhood Chain this time.';
+        if (stale.disconnect) stale.disconnect().catch(function () {});
+        return;
+      }
+      // Injected wallet, wrong network: re-send the switch request —
+      // this is the request that pops up in the wallet for approval.
       $('buyNote').textContent = 'Asking your wallet to switch to Robinhood Chain — approve it in your wallet app.';
       ensureChain(provider).then(function () {
         return provider.request({ method: 'eth_chainId' });
@@ -606,10 +631,10 @@
         if (chainOk) {
           afterConnect();
         } else {
-          $('buyNote').textContent = 'Still on the wrong network — if your wallet cannot switch to Robinhood Chain from here, open dotgent.xyz inside your wallet app\'s own browser instead.';
+          $('buyNote').textContent = 'Still on the wrong network — switch it to Robinhood Chain in your wallet, then tap BUY.';
         }
       }).catch(function () {
-        $('buyNote').textContent = 'The switch was not approved — if your wallet cannot switch to Robinhood Chain from here, open dotgent.xyz inside your wallet app\'s own browser instead.';
+        $('buyNote').textContent = 'The switch was not approved — switch it to Robinhood Chain in your wallet, then tap BUY.';
       });
       return;
     }
@@ -620,6 +645,12 @@
     if (!account || !provider) return;
     var wei = parseEth($('buyAmount').value);
     if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
+    if (isWC && !chainOk) {
+      // A wrong-network WC session can never buy — switch requests hang
+      // unanswered. Point at the reset instead of freezing on CHECKING.
+      $('buyNote').textContent = 'Your saved connection is on the wrong network — tap your address button above, then CONNECT WALLET again and approve the fresh request.';
+      return;
+    }
     $('buyBtn').disabled = true;
     $('buyBtn').textContent = 'CHECKING…';
     ensureChain(provider).catch(function () {}).then(function () {
