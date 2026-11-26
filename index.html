@@ -271,14 +271,8 @@
       </a>
       <div class="task">
         <span class="num" id="tplNum">3</span>
-        <span class="txt"><strong>Post the template</strong><span>Your own post, with this exact text:</span>
-          <span class="tpl-box" id="tplText">I just joined the $DGTG giveaway 🚀
-Dotgent is LIVE on Pons — Robinhood Chain!
-Join here 👉 dotgent.xyz
-CA: 0x8193aD27443Fde06589987d8c668C0AD92185F4A
-#DGTG #RobinhoodChain</span>
+        <span class="txt"><strong>Post the template</strong><span>Your own post — one tap, the text is already filled in:</span>
           <span class="tpl-actions">
-            <button type="button" id="copyTplBtn">COPY TEMPLATE</button>
             <a id="postTplBtn" href="#" target="_blank" rel="noopener">POST IT ON X →</a>
           </span>
         </span>
@@ -332,26 +326,17 @@ CA: 0x8193aD27443Fde06589987d8c668C0AD92185F4A
   });
 
   // ---------- giveaway: template post + verified-post gate ----------
-  var tplText = document.getElementById('tplText').textContent.trim();
+  var tplText = 'I just joined the $DGTG giveaway 🚀\n' +
+    'Dotgent is LIVE on Pons — Robinhood Chain!\n' +
+    'Join here 👉 dotgent.xyz\n' +
+    'CA: 0x8193aD27443Fde06589987d8c668C0AD92185F4A\n' +
+    '#DGTG #RobinhoodChain';
   document.getElementById('postTplBtn').href =
     'https://x.com/intent/post?text=' + encodeURIComponent(tplText);
   function markDone(id) {
     var n = document.getElementById(id);
     if (n) { n.textContent = '✓'; n.style.background = '#0B7A55'; n.style.borderColor = '#0B7A55'; }
   }
-  document.getElementById('copyTplBtn').addEventListener('click', function () {
-    var btn = this;
-    function done() { btn.textContent = 'COPIED ✓'; setTimeout(function () { btn.textContent = 'COPY TEMPLATE'; }, 2000); }
-    function fallback() {
-      var ta = document.createElement('textarea');
-      ta.value = tplText; document.body.appendChild(ta); ta.select();
-      try { document.execCommand('copy'); done(); } catch (e) {}
-      document.body.removeChild(ta);
-    }
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(tplText).then(done).catch(fallback);
-    } else { fallback(); }
-  });
   document.getElementById('postTplBtn').addEventListener('click', function () { markDone('tplNum'); });
 
   // verify gate: the server reads the visitor's post and checks the template
