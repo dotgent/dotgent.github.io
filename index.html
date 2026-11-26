@@ -484,10 +484,11 @@
   var lastQuoteWei = null, lastQuoteAt = 0;
 
   function $(id) { return document.getElementById(id); }
-  function rpc(method, params) {
+  var RPC_PROXY = 'https://dotgent-giveaway.reuniakbarpunk212.workers.dev/rpc';
+  function rpcOnce(url, method, params) {
     // Hard 10s timeout: in wallet-app browsers a page fetch can hang
     // forever without rejecting, which silently froze the buy's quote
-    // check. Aborting lets callers fall back to the wallet provider.
+    // check. Aborting lets callers fall back to the next source.
     var ctrl = ('AbortController' in window) ? new AbortController() : null;
     var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 10000) : null;
     var opts = {
@@ -495,12 +496,24 @@
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
     };
     if (ctrl) opts.signal = ctrl.signal;
-    return fetch(RPC, opts).then(function (r) {
+    return fetch(url, opts).then(function (r) {
       if (timer) clearTimeout(timer);
+      if (r.status >= 400) throw new Error('http ' + r.status);
       return r.json();
     }).catch(function (e) {
       if (timer) clearTimeout(timer);
       throw e;
+    });
+  }
+  function rpc(method, params) {
+    // Read path: the worker proxy first — some phones stall on direct
+    // fetches to the chain RPC host, while workers.dev answers anywhere.
+    // The direct RPC stays as fallback.
+    return rpcOnce(RPC_PROXY, method, params).then(function (res) {
+      if (res && res.error && res.error.code === 429) throw new Error('rate limited');
+      return res;
+    }).catch(function () {
+      return rpcOnce(RPC, method, params);
     });
   }
   function pad32(big) {
@@ -673,6 +686,20 @@
         throw err;
       });
   }
+  function bounceToWallet() {
+    // On mobile, a WalletConnect request sits silently in the relay
+    // unless the wallet app is brought to the front. The connect modal
+    // gets the user there with a deeplink — do the same for switch and
+    // buy requests, using the redirect the wallet itself handed the
+    // session at pairing time.
+    if (!isWC || !wcProvider) return;
+    try {
+      var s = wcProvider.session || (wcProvider.signer && wcProvider.signer.session);
+      var red = s && s.peer && s.peer.metadata && s.peer.metadata.redirect;
+      var url = red && (red.native || red.universal);
+      if (url) window.location.href = url;
+    } catch (e) {}
+  }
   function readChain(p) {
     // eth_chainId with a 6s cap — a stalled read must never freeze a flow.
     return Promise.race([
@@ -765,9 +792,10 @@
     readChain(provider).catch(function () { return '0x0'; }).then(function (cid) {
       if (cid === CHAIN_ID_HEX) return cid;
       $('buyBtn').textContent = 'WAITING FOR SWITCH…';
-      $('buyNote').textContent = 'Asking your wallet to switch to Robinhood Chain — approve it in your wallet app, then come back to this tab.';
+      $('buyNote').textContent = 'Your wallet app should open — approve the switch to Robinhood Chain there, then come back to this tab. If it doesn\'t open by itself, open the wallet app manually: the request is waiting there.';
       // Fire-and-forget: never await the switch request (see waitForChain).
       switchToRH(provider).catch(function () {});
+      bounceToWallet();
       return waitForChain(provider, 24).then(function (ok) { return ok ? CHAIN_ID_HEX : '0x0'; });
     }).then(function (cid) {
       if (cid !== CHAIN_ID_HEX) {
@@ -794,10 +822,13 @@
       }
       var minOut = out * 95n / 100n;
       $('buyBtn').textContent = 'CONFIRM IN WALLET…';
-      return provider.request({
+      $('buyNote').textContent = 'Your wallet app should open — approve the buy there. If it doesn\'t open by itself, open the wallet app manually: the request is waiting there.';
+      var sendP = provider.request({
         method: 'eth_sendTransaction',
         params: [{ from: account, to: CURVE, value: '0x' + wei.toString(16), data: encodeBuy(wei, minOut, account) }]
-      }).then(function (hash) {
+      });
+      bounceToWallet();
+      return sendP.then(function (hash) {
         $('buyBtn').textContent = 'PENDING…';
         $('buyNote').textContent = 'Sent! Waiting for the chain to confirm…';
         var tries = 0;
