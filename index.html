@@ -481,6 +481,7 @@
   var BAL_SEL = '70a08231';   // balanceOf(address)
   var WC_PROJECT_ID = '54c8aa050b7571d06b4adfa8f03b6e39';
   var provider = null, account = null, lastQuote = null, quoteTimer = null;
+  var lastQuoteWei = null, lastQuoteAt = 0;
 
   function $(id) { return document.getElementById(id); }
   function rpc(method, params) {
@@ -573,17 +574,17 @@
     var wei = parseEth($('buyAmount').value);
     var from = account || '0x000000000000000000000000000000000000dEaD';
     if (wei === null) {
-      lastQuote = null;
+      lastQuote = null; lastQuoteWei = null;
       $('quoteLine').innerHTML = 'Enter an amount to see how much $DGTG you get.';
       return;
     }
     $('quoteLine').textContent = 'Checking the curve…';
     quoteBuy(wei, from).then(function (out) {
       if (out !== null) {
-        lastQuote = out;
+        lastQuote = out; lastQuoteWei = wei; lastQuoteAt = Date.now();
         $('quoteLine').innerHTML = '≈ ' + fmtNum(out) + ' $DGTG<small>Live quote from the curve, before the anti-snipe window matters — final amount can move a little.</small>';
         } else {
-        lastQuote = null;
+        lastQuote = null; lastQuoteWei = null;
         return findMax(wei, from).then(function (r) {
           if (r) {
             $('quoteLine').innerHTML = 'That\'s over the curve\'s single-buy cap right now.<small>Max one buy ≈ ' + (Number(r.maxWei) / 1e18).toString() + ' ETH (≈ ' + fmtNum(r.out) + ' $DGTG). Split it into smaller buys.</small>';
@@ -609,6 +610,7 @@
   });
 
   refreshQuote();
+  setInterval(refreshQuote, 20000); // keep the panel quote (and the buy's cached quote) fresh
 </script>
 <script>
   // ---------- on-site buy (fresh build) ----------
@@ -733,6 +735,27 @@
     if (account) { showConnected(); return; }
     startConnect();
   });
+  function getBuyQuote(wei) {
+    // Use the quote already showing on the panel whenever it's usable.
+    // Re-fetching at buy time hung forever in wallet browsers: the page
+    // fetch stalls, then the WalletConnect eth_call never answers. The
+    // panel quote refreshes on its own (load, input, every 20s), so the
+    // buy almost never needs a fresh call; the 5% minOut buffer covers
+    // small price moves since it was taken.
+    if (lastQuote !== null && lastQuoteWei === wei && (Date.now() - lastQuoteAt) < 60000) {
+      return Promise.resolve(lastQuote);
+    }
+    return Promise.race([
+      quoteBuy(wei, account),
+      new Promise(function (res) { setTimeout(function () { res('TIMEOUT'); }, 8000); })
+    ]).then(function (out) {
+      if (out === 'TIMEOUT') {
+        if (lastQuote !== null && lastQuoteWei === wei) return lastQuote;
+        return 'NOQUOTE';
+      }
+      return out;
+    });
+  }
   $('buyBtn').addEventListener('click', function () {
     if (!account || !provider) { startConnect(); return; }
     var wei = parseEth($('buyAmount').value);
@@ -754,9 +777,15 @@
         return 'WRONGCHAIN';
       }
       $('buyBtn').textContent = 'CHECKING THE CURVE…';
-      return quoteBuy(wei, account);
+      return getBuyQuote(wei);
     }).then(function (out) {
       if (out === 'WRONGCHAIN' || out === undefined) return;
+      if (out === 'NOQUOTE') {
+        $('buyNote').textContent = 'The price quote is still loading — wait until the $DGTG amount shows above, then tap BUY again.';
+        $('buyBtn').disabled = false;
+        $('buyBtn').textContent = 'BUY $DGTG';
+        return;
+      }
       if (out === null) {
         $('buyNote').textContent = 'That amount is over the curve\'s single-buy cap right now — lower it and try again.';
         $('buyBtn').disabled = false;
