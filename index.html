@@ -123,6 +123,15 @@
   .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
   .btn-connect{width:100%;margin-top:12px;padding:14px;font-size:16px;background:var(--ink);color:#fff}
   .btn-buy{width:100%;margin-top:10px;padding:15px;font-size:17px;background:var(--orange);color:#fff}
+  .btn-buy:disabled{opacity:.45;cursor:not-allowed;box-shadow:2px 2px 0 var(--ink)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chipbtn{
+    font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer;
+    border:2.5px solid var(--ink);border-radius:999px;padding:6px 13px;background:#FFF3E2;
+  }
+  .chipbtn:active{background:var(--sun)}
+  .quote{margin-top:12px;font-weight:900;font-size:16.5px;min-height:22px}
+  .quote small{display:block;font-weight:700;font-size:12.5px;color:#8A7658;margin-top:2px}
   .buy-note{margin-top:10px;font-size:13px;font-weight:700;color:#8A7658}
   /* giveaway rail */
   .rail{margin-top:18px;position:relative}
@@ -216,15 +225,22 @@
   <!-- BUY PANEL -->
   <section class="panel panel-buy" id="buy">
     <h2>BUY $DGTG <span class="tag">RIGHT HERE</span></h2>
-    <p>Trading is live on the Pons curve. Tap BUY to open the Dotgent trading page and grab your $DGTG.</p>
+    <p>No detours. Connect your wallet, type an amount, done — the tokens land straight in your wallet.</p>
     <div class="buy-box">
       <div class="buy-row">
-        <input type="text" inputmode="decimal" placeholder="0.01" id="buyAmount" autocomplete="off">
+        <input type="text" inputmode="decimal" placeholder="0.0005" id="buyAmount" value="0.0005" autocomplete="off">
         <span class="unit">ETH</span>
       </div>
+      <div class="chips">
+        <button type="button" class="chipbtn" data-amt="0.0001">0.0001</button>
+        <button type="button" class="chipbtn" data-amt="0.0003">0.0003</button>
+        <button type="button" class="chipbtn" data-amt="0.0005">0.0005</button>
+        <button type="button" class="chipbtn" data-amt="0.0008">0.0008</button>
+      </div>
+      <div class="quote" id="quoteLine">Enter an amount to see how much $DGTG you get.</div>
       <button class="btn btn-connect" id="connectBtn" type="button">CONNECT WALLET</button>
-      <a class="btn btn-buy" href="https://ponsfamily.com/launchpad/0x8193aD27443Fde06589987d8c668C0AD92185F4A" target="_blank" rel="noopener">BUY $DGTG</a>
-      <div class="buy-note" id="buyNote">Trading is LIVE — tap BUY to open the Dotgent page on Pons.</div>
+      <button class="btn btn-buy" id="buyBtn" type="button" disabled>BUY $DGTG</button>
+      <div class="buy-note" id="buyNote">Trading is LIVE on the Pons curve — buys happen right here, straight from your wallet.</div>
     </div>
   </section>
 
@@ -333,10 +349,249 @@
     }
   });
 
-  // buy panel: on-site wallet buying is the next upgrade; BUY already trades on Pons
-  document.getElementById('connectBtn').addEventListener('click', function () {
-    document.getElementById('buyNote').textContent = 'On-site wallet buying is coming to this page — for now, tap BUY to trade on Pons.';
+  // ---------- on-site buy: Pons curve, straight from the visitor's wallet ----------
+  var RPC = 'https://rpc.mainnet.chain.robinhood.com';
+  var CHAIN_ID_HEX = '0x1227'; // 4663
+  var CURVE = '0x0D7F81d0881d11C74C9684F03C6D0c2931547940';
+  var TOKEN = '0x8193aD27443Fde06589987d8c668C0AD92185F4A';
+  var BUY_SEL = '59a87bc1';   // buy(uint256,uint256,address)
+  var BAL_SEL = '70a08231';   // balanceOf(address)
+  var WC_PROJECT_ID = '54c8aa050b7571d06b4adfa8f03b6e39';
+  var provider = null, account = null, lastQuote = null, quoteTimer = null;
+
+  function $(id) { return document.getElementById(id); }
+  function rpc(method, params) {
+    return fetch(RPC, {
+      method: 'POST', headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
+    }).then(function (r) { return r.json(); });
+  }
+  function pad32(big) {
+    var h = big.toString(16);
+    while (h.length < 64) h = '0' + h;
+    return h;
+  }
+  function padAddr(a) {
+    var h = a.toLowerCase().replace('0x', '');
+    while (h.length < 64) h = '0' + h;
+    return h;
+  }
+  function parseEth(str) {
+    str = (str || '').trim().replace(',', '.');
+    if (!/^\d*(\.\d*)?$/.test(str) || str === '' || str === '.') return null;
+    var parts = str.split('.');
+    var whole = parts[0] === '' ? '0' : parts[0];
+    var frac = ((parts[1] || '') + '000000000000000000').slice(0, 18);
+    var wei = BigInt(whole) * 1000000000000000000n + BigInt(frac);
+    return wei > 0n ? wei : null;
+  }
+  function fmtNum(big) { // 18-dec token amount -> grouped integer string
+    var s = (big / 1000000000000000000n).toString();
+    return s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  function encodeBuy(amountWei, minOut, addr) {
+    return '0x' + BUY_SEL + pad32(amountWei) + pad32(minOut) + padAddr(addr);
+  }
+  function quoteBuy(amountWei, fromAddr) {
+    var data = encodeBuy(amountWei, 0n, fromAddr);
+    return rpc('eth_call', [{ to: CURVE, from: fromAddr, value: '0x' + amountWei.toString(16), data: data }, 'latest'])
+      .then(function (res) {
+        if (res.result && res.result !== '0x') return BigInt(res.result);
+        return null;
+      }).catch(function () { return null; });
+  }
+  function findMax(amountWei, fromAddr) {
+    var cur = amountWei;
+    var tries = 0;
+    function step() {
+      cur = cur / 2n;
+      tries++;
+      if (cur <= 0n || tries > 10) return Promise.resolve(null);
+      return quoteBuy(cur, fromAddr).then(function (out) {
+        if (out !== null) return { maxWei: cur, out: out };
+        return step();
+      });
+    }
+    return step();
+  }
+  function tokenBalance(addr) {
+    return rpc('eth_call', [{ to: TOKEN, data: '0x' + BAL_SEL + padAddr(addr) }, 'latest'])
+      .then(function (res) { return res.result ? BigInt(res.result) : 0n; })
+      .catch(function () { return 0n; });
+  }
+  function refreshQuote() {
+    var wei = parseEth($('buyAmount').value);
+    var from = account || '0x000000000000000000000000000000000000dEaD';
+    if (wei === null) {
+      lastQuote = null;
+      $('quoteLine').innerHTML = 'Enter an amount to see how much $DGTG you get.';
+      $('buyBtn').disabled = !account;
+      return;
+    }
+    $('quoteLine').textContent = 'Checking the curve…';
+    quoteBuy(wei, from).then(function (out) {
+      if (out !== null) {
+        lastQuote = out;
+        $('quoteLine').innerHTML = '≈ ' + fmtNum(out) + ' $DGTG<small>Live quote from the curve, before the anti-snipe window matters — final amount can move a little.</small>';
+        $('buyBtn').disabled = !account;
+      } else {
+        lastQuote = null;
+        $('buyBtn').disabled = true;
+        return findMax(wei, from).then(function (r) {
+          if (r) {
+            $('quoteLine').innerHTML = 'That\'s over the curve\'s single-buy cap right now.<small>Max one buy ≈ ' + (Number(r.maxWei) / 1e18).toString() + ' ETH (≈ ' + fmtNum(r.out) + ' $DGTG). Split it into smaller buys.</small>';
+          } else {
+            $('quoteLine').textContent = 'The curve didn\'t answer — try a smaller amount.';
+          }
+        });
+      }
+    });
+  }
+  function scheduleQuote() {
+    clearTimeout(quoteTimer);
+    quoteTimer = setTimeout(refreshQuote, 350);
+  }
+  $('buyAmount').addEventListener('input', scheduleQuote);
+  document.querySelectorAll('.chipbtn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      $('buyAmount').value = b.getAttribute('data-amt');
+      refreshQuote();
+    });
   });
+
+  function loadWC() {
+    return new Promise(function (resolve, reject) {
+      if (window['@walletconnect/ethereum-provider']) return resolve();
+      var urls = [
+        'https://unpkg.com/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js',
+        'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js'
+      ];
+      var i = 0;
+      function next() {
+        if (i >= urls.length) return reject(new Error('wc load failed'));
+        var s = document.createElement('script');
+        s.src = urls[i++];
+        s.onload = function () { resolve(); };
+        s.onerror = next;
+        document.head.appendChild(s);
+      }
+      next();
+    });
+  }
+  function ensureChain(p) {
+    return p.request({ method: 'eth_chainId' }).then(function (cid) {
+      if (cid === CHAIN_ID_HEX) return;
+      return p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] })
+        .catch(function (err) {
+          if (err && err.code === 4902) {
+            return p.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: CHAIN_ID_HEX, chainName: 'Robinhood Chain',
+                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                rpcUrls: [RPC], blockExplorerUrls: ['https://robinhoodchain.blockscout.com']
+              }]
+            });
+          }
+          throw err;
+        });
+    });
+  }
+  function afterConnect() {
+    $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
+    $('buyBtn').disabled = false;
+    tokenBalance(account).then(function (bal) {
+      $('buyNote').textContent = 'Connected. Your balance: ' + fmtNum(bal) + ' $DGTG.';
+    });
+    refreshQuote();
+  }
+  $('connectBtn').addEventListener('click', function () {
+    if (account) return;
+    $('connectBtn').textContent = 'CONNECTING…';
+    var getProvider;
+    if (window.ethereum) {
+      provider = window.ethereum;
+      getProvider = Promise.resolve(provider);
+    } else {
+      getProvider = loadWC().then(function () {
+        return window['@walletconnect/ethereum-provider'].EthereumProvider.init({
+          projectId: WC_PROJECT_ID, chains: [4663], showQrModal: true,
+          metadata: { name: 'Dotgent', description: 'Dotgent (DGTG) on Robinhood Chain', url: 'https://dotgent.xyz', icons: ['https://dotgent.xyz/mascot.webp'] }
+        });
+      }).then(function (wc) {
+        provider = wc;
+        return wc.connect().then(function () { return wc; });
+      });
+    }
+    getProvider.then(function (p) {
+      return ensureChain(p).then(function () {
+        return p.request({ method: 'eth_requestAccounts' });
+      });
+    }).then(function (accs) {
+      account = accs[0];
+      afterConnect();
+    }).catch(function (err) {
+      $('connectBtn').textContent = 'CONNECT WALLET';
+      $('buyNote').textContent = 'Connect was cancelled or failed — try again, or open this page inside your wallet app\'s browser.';
+    });
+  });
+
+  $('buyBtn').addEventListener('click', function () {
+    if (!account || !provider) return;
+    var wei = parseEth($('buyAmount').value);
+    if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
+    $('buyBtn').disabled = true;
+    $('buyBtn').textContent = 'CHECKING…';
+    quoteBuy(wei, account).then(function (out) {
+      if (out === null) {
+        $('buyNote').textContent = 'That amount is over the curve\'s single-buy cap right now — lower it and try again.';
+        $('buyBtn').disabled = false;
+        $('buyBtn').textContent = 'BUY $DGTG';
+        return;
+      }
+      var minOut = out * 95n / 100n;
+      $('buyBtn').textContent = 'CONFIRM IN WALLET…';
+      return provider.request({
+        method: 'eth_sendTransaction',
+        params: [{ from: account, to: CURVE, value: '0x' + wei.toString(16), data: encodeBuy(wei, minOut, account) }]
+      }).then(function (hash) {
+        $('buyBtn').textContent = 'PENDING…';
+        $('buyNote').textContent = 'Sent! Waiting for the chain to confirm…';
+        var tries = 0;
+        (function poll() {
+          tries++;
+          rpc('eth_getTransactionReceipt', [hash]).then(function (res) {
+            if (res.result) {
+              if (res.result.status === '0x1') {
+                $('buyNote').textContent = 'Done — the $DGTG is in your wallet. Welcome to the dots 🟠';
+                $('buyBtn').textContent = 'BUY $DGTG';
+                $('buyBtn').disabled = false;
+                tokenBalance(account).then(function (bal) {
+                  $('quoteLine').innerHTML = 'Your balance: ' + fmtNum(bal) + ' $DGTG';
+                });
+              } else {
+                $('buyNote').textContent = 'The transaction failed on-chain — no tokens moved. Try a smaller amount.';
+                $('buyBtn').textContent = 'BUY $DGTG';
+                $('buyBtn').disabled = false;
+              }
+            } else if (tries < 40) {
+              setTimeout(poll, 1500);
+            } else {
+              $('buyNote').textContent = 'Still pending — check your wallet activity in a bit.';
+              $('buyBtn').textContent = 'BUY $DGTG';
+              $('buyBtn').disabled = false;
+            }
+          });
+        })();
+      });
+    }).catch(function (err) {
+      $('buyNote').textContent = 'Buy cancelled in the wallet, or it failed — nothing was spent.';
+      $('buyBtn').textContent = 'BUY $DGTG';
+      $('buyBtn').disabled = false;
+    });
+  });
+
+  refreshQuote();
 </script>
 </body>
 </html>
