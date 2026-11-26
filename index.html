@@ -395,16 +395,19 @@
     var callObj = { to: to, data: data };
     if (fromAddr) callObj.from = fromAddr;
     if (valueHex) callObj.value = valueHex;
-    // Once a wallet is connected, route reads through the wallet itself —
-    // wallet-app browsers can block direct RPC fetches from pages.
-    if (provider && account) {
-      return provider.request({ method: 'eth_call', params: [callObj, 'latest'] })
-        .then(function (hex) { return (hex && hex !== '0x') ? hex : null; })
-        .catch(function () { return null; });
-    }
+    // Direct RPC read first (works in normal browsers, connected or not).
+    // Fall back to the connected wallet only when the direct read fails —
+    // wallet-app browsers can block page fetches, while WalletConnect
+    // wallets may answer eth_call on the wrong network.
     return rpc('eth_call', [callObj, 'latest'])
       .then(function (res) { return (res.result && res.result !== '0x') ? res.result : null; })
-      .catch(function () { return null; });
+      .catch(function () { return null; })
+      .then(function (hex) {
+        if (hex !== null || !(provider && account)) return hex;
+        return provider.request({ method: 'eth_call', params: [callObj, 'latest'] })
+          .then(function (h) { return (h && h !== '0x') ? h : null; })
+          .catch(function () { return null; });
+      });
   }
   function quoteBuy(amountWei, fromAddr) {
     var data = encodeBuy(amountWei, 0n, fromAddr);
@@ -451,7 +454,9 @@
           if (r) {
             $('quoteLine').innerHTML = 'That\'s over the curve\'s single-buy cap right now.<small>Max one buy ≈ ' + (Number(r.maxWei) / 1e18).toString() + ' ETH (≈ ' + fmtNum(r.out) + ' $DGTG). Split it into smaller buys.</small>';
           } else {
-            $('quoteLine').textContent = 'Couldn\'t load the price — connect your wallet first, or check your connection and try again.';
+            $('quoteLine').textContent = account
+              ? 'Couldn\'t load the price — your wallet may be on the wrong network. Switch it to Robinhood Chain, then try again.'
+              : 'Couldn\'t load the price — connect your wallet first, or check your connection and try again.';
           }
         });
       }
@@ -511,9 +516,15 @@
   function afterConnect() {
     $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
     $('buyBtn').disabled = false;
-    tokenBalance(account).then(function (bal) {
-      $('buyNote').textContent = 'Connected. Your balance: ' + fmtNum(bal) + ' $DGTG.';
-    });
+    provider.request({ method: 'eth_chainId' }).then(function (cid) {
+      if (cid !== CHAIN_ID_HEX) {
+        $('buyNote').textContent = 'Connected, but your wallet is not on Robinhood Chain yet — switch its network to Robinhood Chain, then tap BUY.';
+        return;
+      }
+      return tokenBalance(account).then(function (bal) {
+        $('buyNote').textContent = 'Connected. Your balance: ' + fmtNum(bal) + ' $DGTG.';
+      });
+    }).catch(function () {});
     refreshQuote();
   }
   $('connectBtn').addEventListener('click', function () {
