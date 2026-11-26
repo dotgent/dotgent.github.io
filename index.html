@@ -626,16 +626,7 @@
   setInterval(refreshQuote, 20000); // keep the panel quote (and the buy's cached quote) fresh
 </script>
 <script>
-  // ---------- on-site buy (fresh build) ----------
-  // Rules baked in from the first attempt's failures:
-  // - ONE WalletConnect provider for the whole page; init once, and
-  //   await connect() before any request.
-  // - Session proposal: chains [1] (universal) + optionalChains [4663].
-  //   Offering 4663 alone gets rejected by wallets that don't know it;
-  //   offering only big chains lets wallets drop 4663 from the session.
-  // - NEVER disconnect/reset a session mid-flow. Wrong network is fixed
-  //   by wallet_switchEthereumChain — that request is what pops the
-  //   approval inside the wallet app — with addEthereumChain on 4902.
+  // ---------- buy: open wallet -> connect -> switch network -> buy. Done. ----------
   var isWC = false;
   var wcProvider = null;
   function loadWC() {
@@ -670,105 +661,26 @@
       });
     }).then(function (wc) { wcProvider = wc; return wc; });
   }
-  function switchToRH(p) {
+  function addChain(p) {
+    return p.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId: CHAIN_ID_HEX, chainName: 'Robinhood Chain',
+        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+        rpcUrls: [RPC], blockExplorerUrls: ['https://robinhoodchain.blockscout.com']
+      }]
+    });
+  }
+  function switchChain(p) {
     return p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] })
       .catch(function (err) {
-        if (err && err.code === 4902) {
-          return p.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: CHAIN_ID_HEX, chainName: 'Robinhood Chain',
-              nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-              rpcUrls: [RPC], blockExplorerUrls: ['https://robinhoodchain.blockscout.com']
-            }]
-          });
-        }
+        if (err && err.code === 4902) return addChain(p);
         throw err;
       });
   }
-  function bounceToWallet() {
-    // On mobile, a WalletConnect request sits silently in the relay
-    // unless the wallet app is brought to the front. The connect modal
-    // gets the user there with a deeplink — do the same for switch and
-    // buy requests, using the redirect the wallet itself handed the
-    // session at pairing time.
-    if (!isWC || !wcProvider) return;
-    try {
-      var s = wcProvider.session || (wcProvider.signer && wcProvider.signer.session);
-      var red = s && s.peer && s.peer.metadata && s.peer.metadata.redirect;
-      var url = red && (red.native || red.universal);
-      if (url) window.location.href = url;
-    } catch (e) {}
-  }
-  function readChain(p) {
-    // eth_chainId with a 6s cap — a stalled read must never freeze a flow.
-    return Promise.race([
-      p.request({ method: 'eth_chainId' }),
-      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('slow')); }, 6000); })
-    ]);
-  }
-  function waitForChain(p, tries) {
-    // Poll eth_chainId until Robinhood Chain shows up. Over WalletConnect
-    // many wallets apply a network switch but never answer the switch
-    // request itself — awaiting it froze the buy on CHECKING forever.
-    function read() { return readChain(p); }
-    return read().then(function (cid) {
-      if (cid === CHAIN_ID_HEX) return true;
-      if (tries <= 0) return false;
-      return new Promise(function (res) { setTimeout(res, 1500); }).then(function () { return waitForChain(p, tries - 1); });
-    }).catch(function () {
-      if (tries <= 0) return false;
-      return new Promise(function (res) { setTimeout(res, 1500); }).then(function () { return waitForChain(p, tries - 1); });
-    });
-  }
-  function showConnected() {
-    $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
-    $('buyBtn').disabled = false;
-    return provider.request({ method: 'eth_chainId' }).then(function (cid) {
-      if (cid === CHAIN_ID_HEX) {
-        return tokenBalance(account).then(function (bal) {
-          $('buyNote').textContent = 'Connected on Robinhood Chain. Your balance: ' + fmtNum(bal) + ' $DGTG.';
-        });
-      }
-      $('buyNote').textContent = 'Connected, but not on Robinhood Chain — tap BUY and approve the switch in your wallet app.';
-    }).catch(function () {});
-  }
-  function startConnect() {
-    $('connectBtn').textContent = 'CONNECTING…';
-    $('buyNote').textContent = 'Approve the connection inside your wallet app, then come back to this tab.';
-    var chain;
-    if (window.ethereum) {
-      isWC = false;
-      provider = window.ethereum;
-      chain = provider.request({ method: 'eth_requestAccounts' }).then(function (accs) { account = accs[0]; });
-    } else {
-      isWC = true;
-      chain = getWC().then(function (wc) {
-        provider = wc;
-        return wc.connect(); // required before any request on this provider
-      }).then(function () {
-        return provider.request({ method: 'eth_accounts' });
-      }).then(function (accs) {
-        account = (accs && accs[0]) || (provider.accounts && provider.accounts[0]);
-        if (!account) throw new Error('no account');
-      });
-    }
-    return chain.then(function () { return showConnected(); }).catch(function () {
-      $('connectBtn').textContent = 'CONNECT WALLET';
-      $('buyNote').textContent = 'Connect was cancelled or failed — try again. Opening this page inside your wallet app\'s own browser works best.';
-    });
-  }
-  $('connectBtn').addEventListener('click', function () {
-    if (account) { showConnected(); return; }
-    startConnect();
-  });
   function getBuyQuote(wei) {
-    // Use the quote already showing on the panel whenever it's usable.
-    // Re-fetching at buy time hung forever in wallet browsers: the page
-    // fetch stalls, then the WalletConnect eth_call never answers. The
-    // panel quote refreshes on its own (load, input, every 20s), so the
-    // buy almost never needs a fresh call; the 5% minOut buffer covers
-    // small price moves since it was taken.
+    // The quote already showing on the panel (it refreshes on its own).
+    // Only fetch fresh when there is nothing usable on screen.
     if (lastQuote !== null && lastQuoteWei === wei && (Date.now() - lastQuoteAt) < 60000) {
       return Promise.resolve(lastQuote);
     }
@@ -783,33 +695,75 @@
       return out;
     });
   }
+  function connect() {
+    $('connectBtn').textContent = 'CONNECTING…';
+    $('buyNote').textContent = 'Approve the connection in your wallet.';
+    var getP;
+    if (window.ethereum) {
+      isWC = false;
+      provider = window.ethereum;
+      getP = provider.request({ method: 'eth_requestAccounts' }).then(function (accs) { account = accs[0]; });
+    } else {
+      isWC = true;
+      getP = getWC().then(function (wc) {
+        provider = wc;
+        return wc.connect();
+      }).then(function () {
+        return provider.request({ method: 'eth_accounts' });
+      }).then(function (accs) {
+        account = (accs && accs[0]) || (provider.accounts && provider.accounts[0]);
+        if (!account) throw new Error('no account');
+      });
+    }
+    return getP.then(function () {
+      return provider.request({ method: 'eth_chainId' });
+    }).then(function (cid) {
+      if (cid !== CHAIN_ID_HEX) return switchChain(provider); // switch right away, as part of connecting
+    }).then(function () {
+      return provider.request({ method: 'eth_chainId' });
+    }).then(function (cid) {
+      if (cid === CHAIN_ID_HEX) return cid;
+      // Some wallets resolve the switch a beat before the new chain is
+      // readable — one short second look before calling it wrong.
+      return new Promise(function (res) { setTimeout(res, 800); }).then(function () {
+        return provider.request({ method: 'eth_chainId' });
+      });
+    }).then(function (cid) {
+      $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
+      $('buyBtn').disabled = false;
+      if (cid !== CHAIN_ID_HEX) {
+        $('buyNote').textContent = 'Connected, but not on Robinhood Chain — switch the network in your wallet, then tap BUY.';
+        return;
+      }
+      return tokenBalance(account).then(function (bal) {
+        $('buyNote').textContent = 'Connected on Robinhood Chain. Your balance: ' + fmtNum(bal) + ' $DGTG.';
+      }).catch(function () {});
+    }).catch(function () {
+      $('connectBtn').textContent = 'CONNECT WALLET';
+      $('buyNote').textContent = 'Connect was cancelled — try again.';
+    });
+  }
+  $('connectBtn').addEventListener('click', function () {
+    if (account) return;
+    connect();
+  });
   $('buyBtn').addEventListener('click', function () {
-    if (!account || !provider) { startConnect(); return; }
+    if (!account || !provider) { connect(); return; }
     var wei = parseEth($('buyAmount').value);
     if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
     $('buyBtn').disabled = true;
-    $('buyBtn').textContent = 'CHECKING…';
-    readChain(provider).catch(function () { return '0x0'; }).then(function (cid) {
+    $('buyBtn').textContent = 'CONFIRM IN WALLET…';
+    provider.request({ method: 'eth_chainId' }).then(function (cid) {
       if (cid === CHAIN_ID_HEX) return cid;
-      $('buyBtn').textContent = 'WAITING FOR SWITCH…';
-      $('buyNote').textContent = 'Your wallet app should open — approve the switch to Robinhood Chain there, then come back to this tab. If it doesn\'t open by itself, open the wallet app manually: the request is waiting there.';
-      // Fire-and-forget: never await the switch request (see waitForChain).
-      switchToRH(provider).catch(function () {});
-      bounceToWallet();
-      return waitForChain(provider, 24).then(function (ok) { return ok ? CHAIN_ID_HEX : '0x0'; });
+      return switchChain(provider).then(function () {
+        return provider.request({ method: 'eth_chainId' });
+      });
     }).then(function (cid) {
-      if (cid !== CHAIN_ID_HEX) {
-        $('buyNote').textContent = 'Still on the wrong network — switch to Robinhood Chain in your wallet, then tap BUY again.';
-        $('buyBtn').disabled = false;
-        $('buyBtn').textContent = 'BUY $DGTG';
-        return 'WRONGCHAIN';
-      }
-      $('buyBtn').textContent = 'CHECKING THE CURVE…';
+      if (cid !== CHAIN_ID_HEX) throw new Error('wrong chain');
       return getBuyQuote(wei);
     }).then(function (out) {
-      if (out === 'WRONGCHAIN' || out === undefined) return;
       if (out === 'NOQUOTE') {
-        $('buyNote').textContent = 'The price quote is still loading — wait until the $DGTG amount shows above, then tap BUY again.';
+        $('buyNote').textContent = 'The price is still loading — wait until the $DGTG amount shows above, then tap BUY again.';
         $('buyBtn').disabled = false;
         $('buyBtn').textContent = 'BUY $DGTG';
         return;
@@ -821,46 +775,46 @@
         return;
       }
       var minOut = out * 95n / 100n;
-      $('buyBtn').textContent = 'CONFIRM IN WALLET…';
-      $('buyNote').textContent = 'Your wallet app should open — approve the buy there. If it doesn\'t open by itself, open the wallet app manually: the request is waiting there.';
-      var sendP = provider.request({
+      return provider.request({
         method: 'eth_sendTransaction',
         params: [{ from: account, to: CURVE, value: '0x' + wei.toString(16), data: encodeBuy(wei, minOut, account) }]
-      });
-      bounceToWallet();
-      return sendP.then(function (hash) {
+      }).then(function (hash) {
         $('buyBtn').textContent = 'PENDING…';
         $('buyNote').textContent = 'Sent! Waiting for the chain to confirm…';
         var tries = 0;
         (function poll() {
           tries++;
-          provider.request({ method: 'eth_getTransactionReceipt', params: [hash] })
+          var viaWallet = provider.request({ method: 'eth_getTransactionReceipt', params: [hash] })
             .then(function (r) { return { result: r }; })
-            .catch(function () { return rpc('eth_getTransactionReceipt', [hash]); })
-            .then(function (res) {
-              if (res.result) {
-                if (res.result.status === '0x1') {
-                  $('buyNote').textContent = 'Done — the $DGTG is in your wallet. Welcome to the dots 🟠';
-                  tokenBalance(account).then(function (bal) {
-                    $('quoteLine').innerHTML = 'Your balance: ' + fmtNum(bal) + ' $DGTG';
-                  });
-                } else {
-                  $('buyNote').textContent = 'The transaction failed on-chain — no tokens moved. Try a smaller amount.';
-                }
-                $('buyBtn').textContent = 'BUY $DGTG';
-                $('buyBtn').disabled = false;
-              } else if (tries < 40) {
-                setTimeout(poll, 1500);
+            .catch(function () { return rpc('eth_getTransactionReceipt', [hash]); });
+          viaWallet.then(function (res) {
+            if (res.result) {
+              if (res.result.status === '0x1') {
+                $('buyNote').textContent = 'Done — the $DGTG is in your wallet. Welcome to the dots 🟠';
+                tokenBalance(account).then(function (bal) {
+                  $('quoteLine').innerHTML = 'Your balance: ' + fmtNum(bal) + ' $DGTG';
+                });
               } else {
-                $('buyNote').textContent = 'Still pending — check your wallet activity in a bit.';
-                $('buyBtn').textContent = 'BUY $DGTG';
-                $('buyBtn').disabled = false;
+                $('buyNote').textContent = 'The transaction failed on-chain — no tokens moved. Try a smaller amount.';
               }
-            });
+              $('buyBtn').textContent = 'BUY $DGTG';
+              $('buyBtn').disabled = false;
+            } else if (tries < 40) {
+              setTimeout(poll, 1500);
+            } else {
+              $('buyNote').textContent = 'Still pending — check your wallet activity in a bit.';
+              $('buyBtn').textContent = 'BUY $DGTG';
+              $('buyBtn').disabled = false;
+            }
+          }).catch(function () {
+            if (tries < 40) setTimeout(poll, 1500);
+          });
         })();
       });
-    }).catch(function () {
-      $('buyNote').textContent = 'Buy cancelled in the wallet, or it failed — nothing was spent.';
+    }).catch(function (err) {
+      $('buyNote').textContent = (err && err.message === 'wrong chain')
+        ? 'Your wallet is not on Robinhood Chain — switch the network in your wallet, then tap BUY.'
+        : 'Buy cancelled in the wallet, or it failed — nothing was spent.';
       $('buyBtn').textContent = 'BUY $DGTG';
       $('buyBtn').disabled = false;
     });
