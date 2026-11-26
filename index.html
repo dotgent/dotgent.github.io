@@ -532,11 +532,12 @@
     return loadWC().then(function () {
       return window['@walletconnect/ethereum-provider'].EthereumProvider.init({
         projectId: WC_PROJECT_ID,
-        // Robinhood Chain is the required chain — the wallet approves the
-        // session ON this network, so buys never need a mid-flow switch.
-        // (The chains:[1]+optional setup left Bitget sessions stuck on
-        // mainnet, where its WalletConnect ignores switch requests.)
-        chains: [4663], optionalChains: [1, 56],
+        // Robinhood Chain ONLY — no optional chains. With 1/56 offered as
+        // options, Bitget approves the session for ETH+BSC and silently
+        // drops 4663 (seen live in its approval dialog: "2 jaringan",
+        // ETH and BNB icons, no Robinhood). With nothing else on the
+        // table, the session can only land on 4663 — or be rejected.
+        chains: [4663],
         showQrModal: true,
         metadata: { name: 'Dotgent', description: 'Dotgent (DGTG) on Robinhood Chain', url: 'https://dotgent.xyz', icons: ['https://dotgent.xyz/mascot.webp'] }
       });
