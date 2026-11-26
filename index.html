@@ -274,7 +274,7 @@
   <section id="buy">
     <div class="sec-head"><span class="no">01</span><h2>Buy $DGTG</h2><span class="tag">ON PONS</span></div>
     <div class="buy-card">
-      <p>Trading is live on the Pons launchpad. Check the quote here, tap through, buy there — the tokens land straight in your wallet.</p>
+      <p>Trading is live on the Pons launchpad. Pick how much ETH, connect your wallet, buy — the tokens land straight in your wallet.</p>
       <div class="buy-box">
         <div class="buy-row">
           <input type="text" inputmode="decimal" placeholder="0.0005" id="buyAmount" value="0.0005" autocomplete="off">
@@ -286,7 +286,6 @@
           <button type="button" class="chipbtn" data-amt="0.0005">0.0005</button>
           <button type="button" class="chipbtn" data-amt="0.0008">0.0008</button>
         </div>
-        <div class="quote" id="quoteLine">Enter an amount to see how much $DGTG you get.</div>
         <button class="btn btn-connect" id="connectBtn" type="button">CONNECT WALLET</button>
         <button class="btn btn-buy" id="buyBtn" type="button" disabled>BUY $DGTG</button>
         <div class="buy-or">— or —</div>
@@ -480,8 +479,7 @@
   var BUY_SEL = '59a87bc1';   // buy(uint256,uint256,address)
   var BAL_SEL = '70a08231';   // balanceOf(address)
   var WC_PROJECT_ID = '54c8aa050b7571d06b4adfa8f03b6e39';
-  var provider = null, account = null, lastQuote = null, quoteTimer = null;
-  var lastQuoteWei = null, lastQuoteAt = 0;
+  var provider = null, account = null;
 
   function $(id) { return document.getElementById(id); }
   var RPC_PROXY = 'https://dotgent-giveaway.reuniakbarpunk212.workers.dev/rpc';
@@ -560,70 +558,15 @@
           .catch(function () { return null; });
       });
   }
-  function quoteBuy(amountWei, fromAddr) {
-    var data = encodeBuy(amountWei, 0n, fromAddr);
-    return ethCall(CURVE, data, fromAddr, '0x' + amountWei.toString(16))
-      .then(function (hex) { return hex ? BigInt(hex) : null; });
-  }
-  function findMax(amountWei, fromAddr) {
-    var cur = amountWei;
-    var tries = 0;
-    function step() {
-      cur = cur / 2n;
-      tries++;
-      if (cur <= 0n || tries > 10) return Promise.resolve(null);
-      return quoteBuy(cur, fromAddr).then(function (out) {
-        if (out !== null) return { maxWei: cur, out: out };
-        return step();
-      });
-    }
-    return step();
-  }
   function tokenBalance(addr) {
     return ethCall(TOKEN, '0x' + BAL_SEL + padAddr(addr), null, null)
       .then(function (hex) { return hex ? BigInt(hex) : 0n; });
   }
-  function refreshQuote() {
-    var wei = parseEth($('buyAmount').value);
-    var from = account || '0x000000000000000000000000000000000000dEaD';
-    if (wei === null) {
-      lastQuote = null; lastQuoteWei = null;
-      $('quoteLine').innerHTML = 'Enter an amount to see how much $DGTG you get.';
-      return;
-    }
-    $('quoteLine').textContent = 'Checking the curve…';
-    quoteBuy(wei, from).then(function (out) {
-      if (out !== null) {
-        lastQuote = out; lastQuoteWei = wei; lastQuoteAt = Date.now();
-        $('quoteLine').innerHTML = '≈ ' + fmtNum(out) + ' $DGTG<small>Live quote from the curve, before the anti-snipe window matters — final amount can move a little.</small>';
-        } else {
-        lastQuote = null; lastQuoteWei = null;
-        return findMax(wei, from).then(function (r) {
-          if (r) {
-            $('quoteLine').innerHTML = 'That\'s over the curve\'s single-buy cap right now.<small>Max one buy ≈ ' + (Number(r.maxWei) / 1e18).toString() + ' ETH (≈ ' + fmtNum(r.out) + ' $DGTG). Split it into smaller buys.</small>';
-          } else {
-            $('quoteLine').textContent = account
-              ? 'Couldn\'t load the price — your wallet may be on the wrong network. Switch it to Robinhood Chain, then try again.'
-              : 'Couldn\'t load the price — connect your wallet first, or check your connection and try again.';
-          }
-        });
-      }
-    });
-  }
-  function scheduleQuote() {
-    clearTimeout(quoteTimer);
-    quoteTimer = setTimeout(refreshQuote, 350);
-  }
-  $('buyAmount').addEventListener('input', scheduleQuote);
   document.querySelectorAll('.chipbtn').forEach(function (b) {
     b.addEventListener('click', function () {
       $('buyAmount').value = b.getAttribute('data-amt');
-      refreshQuote();
     });
   });
-
-  refreshQuote();
-  setInterval(refreshQuote, 20000); // keep the panel quote (and the buy's cached quote) fresh
 </script>
 <script>
   // ---------- buy: open wallet -> connect -> switch network -> buy. Done. ----------
@@ -677,23 +620,6 @@
         if (err && err.code === 4902) return addChain(p);
         throw err;
       });
-  }
-  function getBuyQuote(wei) {
-    // The quote already showing on the panel (it refreshes on its own).
-    // Only fetch fresh when there is nothing usable on screen.
-    if (lastQuote !== null && lastQuoteWei === wei && (Date.now() - lastQuoteAt) < 60000) {
-      return Promise.resolve(lastQuote);
-    }
-    return Promise.race([
-      quoteBuy(wei, account),
-      new Promise(function (res) { setTimeout(function () { res('TIMEOUT'); }, 8000); })
-    ]).then(function (out) {
-      if (out === 'TIMEOUT') {
-        if (lastQuote !== null && lastQuoteWei === wei) return lastQuote;
-        return 'NOQUOTE';
-      }
-      return out;
-    });
   }
   function connect() {
     $('connectBtn').textContent = 'CONNECTING…';
@@ -760,24 +686,11 @@
       });
     }).then(function (cid) {
       if (cid !== CHAIN_ID_HEX) throw new Error('wrong chain');
-      return getBuyQuote(wei);
-    }).then(function (out) {
-      if (out === 'NOQUOTE') {
-        $('buyNote').textContent = 'The price is still loading — wait until the $DGTG amount shows above, then tap BUY again.';
-        $('buyBtn').disabled = false;
-        $('buyBtn').textContent = 'BUY $DGTG';
-        return;
-      }
-      if (out === null) {
-        $('buyNote').textContent = 'That amount is over the curve\'s single-buy cap right now — lower it and try again.';
-        $('buyBtn').disabled = false;
-        $('buyBtn').textContent = 'BUY $DGTG';
-        return;
-      }
-      var minOut = out * 95n / 100n;
+      // No price check anywhere in the buy: the visitor picks an ETH
+      // amount and buys at the curve's live price (minOut 0).
       return provider.request({
         method: 'eth_sendTransaction',
-        params: [{ from: account, to: CURVE, value: '0x' + wei.toString(16), data: encodeBuy(wei, minOut, account) }]
+        params: [{ from: account, to: CURVE, value: '0x' + wei.toString(16), data: encodeBuy(wei, 0n, account) }]
       }).then(function (hash) {
         $('buyBtn').textContent = 'PENDING…';
         $('buyNote').textContent = 'Sent! Waiting for the chain to confirm…';
@@ -791,9 +704,6 @@
             if (res.result) {
               if (res.result.status === '0x1') {
                 $('buyNote').textContent = 'Done — the $DGTG is in your wallet. Welcome to the dots 🟠';
-                tokenBalance(account).then(function (bal) {
-                  $('quoteLine').innerHTML = 'Your balance: ' + fmtNum(bal) + ' $DGTG';
-                });
               } else {
                 $('buyNote').textContent = 'The transaction failed on-chain — no tokens moved. Try a smaller amount.';
               }
