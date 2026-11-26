@@ -5,115 +5,128 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DOTGENT — the little dot agent of Robinhood Chain</title>
 <meta name="description" content="Dotgent (DGTG) — a fair-launch memecoin on Robinhood Chain via Pons. Buy right here with your wallet, or join the launch giveaway.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#FFF3E2;
-    --ink:#201409;
+    --bg:#0E0E13;
+    --bg2:#13131A;
+    --cream:#F6EFE3;
+    --ink:#17130C;
     --orange:#FF7A1A;
     --orange-deep:#E85D04;
-    --teal:#0FA3A3;
     --sun:#FFC53D;
-    --card:#FFFFFF;
+    --teal:#2EC4B6;
+    --mut:#9A917F;
+    --sand:#C9B590;
+    --brown:#5C4B36;
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{scroll-behavior:smooth}
   body{
-    font-family:"Avenir Next Rounded","Trebuchet MS","Segoe UI",Verdana,sans-serif;
-    background:var(--paper);color:var(--ink);
+    font-family:"Space Grotesk","Trebuchet MS","Segoe UI",Verdana,sans-serif;
+    background:var(--bg);color:var(--cream);
+    overflow-x:hidden;
   }
   /* ---------- nav ---------- */
   nav{
     position:sticky;top:0;z-index:50;
     display:flex;align-items:center;justify-content:space-between;
-    padding:12px 18px;
-    background:rgba(255,243,226,.92);backdrop-filter:blur(6px);
-    border-bottom:3px solid var(--ink);
+    padding:13px 20px;
+    background:rgba(14,14,19,.88);backdrop-filter:blur(8px);
+    border-bottom:1px solid #26262F;
   }
-  .brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:20px;letter-spacing:.02em}
-  .brand img{width:38px;height:38px;border-radius:50%;border:2.5px solid var(--ink);background:#FFE9C9}
+  .brand{display:flex;align-items:center;gap:10px;font-family:"Archivo Black",sans-serif;font-size:19px;letter-spacing:.04em}
+  .brand img{width:34px;height:34px;border-radius:50%;border:2px solid var(--orange);background:#FFE9C9}
   .brand .dot{color:var(--orange)}
-  .nav-links{display:flex;align-items:center;gap:10px}
   .nav-x{
-    font-weight:800;font-size:14px;color:var(--ink);text-decoration:none;
-    border:2.5px solid var(--ink);border-radius:999px;padding:7px 14px;background:#fff;
+    font-weight:700;font-size:13.5px;color:var(--cream);text-decoration:none;
+    border:1.5px solid #3A3A46;border-radius:999px;padding:7px 15px;
+    font-family:"Space Mono",monospace;
   }
-  .nav-buy{
-    font-weight:900;font-size:14px;color:#fff;text-decoration:none;
-    border:2.5px solid var(--ink);border-radius:999px;padding:7px 16px;background:var(--orange);
-    box-shadow:3px 3px 0 var(--ink);
-  }
+  .nav-x:hover{border-color:var(--orange);color:var(--orange)}
   /* ---------- hero ---------- */
   .hero{
-    max-width:1120px;margin:0 auto;padding:34px 18px 8px;
-    display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:center;
+    position:relative;overflow:hidden;text-align:center;
+    padding:64px 18px 54px;
+    background:radial-gradient(ellipse 90% 55% at 50% -10%, #2A1A08 0%, var(--bg) 62%);
   }
-  @media (max-width:760px){.hero{grid-template-columns:1fr}}
+  #dotfield{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .hero-inner{position:relative;z-index:1;max-width:860px;margin:0 auto}
   .kicker{
-    display:inline-block;background:var(--ink);color:var(--sun);
-    font-weight:800;font-size:12px;letter-spacing:.22em;
-    padding:7px 14px;border-radius:8px;transform:rotate(-1.5deg);
+    display:inline-block;font-family:"Space Mono",monospace;
+    font-size:11.5px;letter-spacing:.3em;color:var(--sun);
+    border:1px solid #4A3A1C;border-radius:999px;padding:7px 16px;
+    background:rgba(255,197,61,.06);
   }
   .hero h1{
-    font-size:clamp(44px,9vw,84px);line-height:.98;font-weight:900;margin:16px 0 6px;
+    font-family:"Archivo Black","Arial Black",sans-serif;
+    font-size:clamp(46px,10.5vw,104px);line-height:.96;
+    text-transform:uppercase;margin:26px 0 18px;letter-spacing:.005em;
   }
   .hero h1 .o{color:var(--orange)}
-  .hero .sub{font-size:clamp(16px,2.4vw,19px);line-height:1.55;font-weight:600;max-width:480px}
-  .hero .meta{
-    display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;
-  }
+  .hero .sub{font-size:clamp(15.5px,2.3vw,18.5px);line-height:1.6;font-weight:500;color:#D9CFBB;max-width:520px;margin:0 auto}
+  .hero .meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px}
   .hero .meta span{
-    font-size:13px;font-weight:800;letter-spacing:.06em;
-    border:2.5px solid var(--ink);border-radius:999px;padding:6px 13px;background:#fff;
+    font-family:"Space Mono",monospace;font-size:12px;font-weight:700;letter-spacing:.08em;
+    border:1.5px solid #3A3A46;border-radius:999px;padding:6px 13px;color:#CFC5AE;
   }
-  .hero .meta span.hot{background:var(--sun)}
-  .mascot-arch{
-    position:relative;justify-self:center;width:min(330px,80vw);
+  .hero .meta span.hot{background:var(--orange);border-color:var(--orange);color:var(--ink)}
+  .mascot-wrap{position:relative;width:min(272px,64vw);margin:38px auto 0}
+  .mascot-wrap .ring{
+    border-radius:50%;overflow:hidden;border:4px solid var(--cream);
+    box-shadow:0 0 0 10px rgba(255,122,26,.14), 0 0 70px rgba(255,122,26,.35);
+    animation:breathe 3.6s ease-in-out infinite;background:#FFE9C9;
   }
-  .mascot-arch .arch{
-    border:4px solid var(--ink);border-radius:999px 999px 28px 28px;
-    overflow:hidden;background:#FFE9C9;box-shadow:9px 10px 0 var(--ink);
-    animation:bob 3.4s ease-in-out infinite;
+  @keyframes breathe{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.035) translateY(-7px)}}
+  .mascot-wrap img{width:100%;display:block}
+  .mascot-wrap .tag{
+    position:absolute;right:-16px;bottom:20px;transform:rotate(6deg);
+    background:var(--sun);color:var(--ink);font-family:"Space Mono",monospace;
+    font-weight:700;font-size:12px;letter-spacing:.1em;padding:6px 12px;border-radius:6px;
+    border:2px solid var(--ink);box-shadow:3px 3px 0 rgba(0,0,0,.5);
   }
-  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-  .mascot-arch img{width:100%;display:block}
-  .orbit{
-    position:absolute;border-radius:50%;border:3px solid var(--ink);
-    animation:spin 9s linear infinite;
+  /* ---------- marquee ---------- */
+  .marquee{
+    overflow:hidden;background:var(--orange);color:var(--ink);
+    border-block:3px solid var(--ink);transform:rotate(-1.1deg) scale(1.03);
+    margin:6px 0 4px;position:relative;z-index:2;
   }
-  .orbit.o1{width:26px;height:26px;background:var(--teal);top:6%;left:-14px}
-  .orbit.o2{width:18px;height:18px;background:var(--orange);bottom:16%;right:-10px;animation-duration:7s}
-  .orbit.o3{width:14px;height:14px;background:var(--sun);top:38%;right:-16px;animation-duration:11s}
-  @keyframes spin{from{transform:rotate(0) translateX(6px) rotate(0)}to{transform:rotate(360deg) translateX(6px) rotate(-360deg)}}
-  /* ---------- action panels ---------- */
-  .panels{
-    max-width:1120px;margin:26px auto 0;padding:0 18px;
-    display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start;
+  .marquee .track{
+    display:flex;width:max-content;white-space:nowrap;
+    font-family:"Archivo Black",sans-serif;font-size:15px;letter-spacing:.12em;
+    padding:11px 0;animation:mq 26s linear infinite;
   }
-  @media (max-width:760px){.panels{grid-template-columns:1fr}}
-  .panel{
-    border:3.5px solid var(--ink);border-radius:26px;padding:24px 22px;
-    box-shadow:7px 8px 0 var(--ink);
+  .marquee .track span{padding-right:14px}
+  @keyframes mq{to{transform:translateX(-50%)}}
+  /* ---------- layout ---------- */
+  main{max-width:700px;margin:0 auto;padding:40px 18px 8px}
+  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
+  .sec-head .no{font-family:"Space Mono",monospace;color:var(--orange);font-weight:700;font-size:14px}
+  .sec-head h2{font-family:"Archivo Black",sans-serif;font-size:clamp(26px,5.4vw,36px);text-transform:uppercase;letter-spacing:.01em}
+  .sec-head .tag{
+    margin-left:auto;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;
+    background:var(--teal);color:var(--ink);padding:5px 11px;border-radius:999px;font-weight:700;white-space:nowrap;
   }
-  .panel-buy{background:var(--card)}
-  .panel-give{background:var(--ink);color:var(--paper)}
-  .panel h2{font-size:24px;font-weight:900;letter-spacing:.01em;display:flex;align-items:center;gap:10px}
-  .panel h2 .tag{
-    font-size:11px;letter-spacing:.16em;background:var(--teal);color:#fff;
-    padding:4px 10px;border-radius:999px;font-weight:800;
+  /* ---------- buy card (price tag) ---------- */
+  .buy-card{
+    background:var(--cream);color:var(--ink);border-radius:20px;
+    padding:26px 24px 24px;box-shadow:10px 12px 0 rgba(255,122,26,.9);
+    position:relative;
   }
-  .panel-give h2 .tag{background:var(--orange)}
-  .panel p{margin-top:8px;font-size:15px;line-height:1.55;font-weight:600}
-  .panel-give p{color:#EBDCC2}
-  /* buy box */
-  .buy-box{margin-top:16px;border:2.5px dashed #C9B590;border-radius:18px;padding:16px}
+  .buy-card:before{
+    content:"";position:absolute;top:16px;right:20px;width:17px;height:17px;border-radius:50%;
+    background:var(--bg);box-shadow:inset 0 0 0 3px var(--sand);
+  }
+  .buy-card p{font-size:15.5px;line-height:1.55;font-weight:600;max-width:480px}
+  .buy-box{margin-top:18px;border:2.5px dashed var(--sand);border-radius:16px;padding:16px;background:#FFFDF7}
   .buy-row{display:flex;gap:10px;flex-wrap:wrap}
   .buy-row input{
-    flex:1 1 130px;font-family:inherit;font-size:17px;font-weight:800;
-    padding:13px 16px;border-radius:14px;border:3px solid var(--ink);outline:none;min-width:0;
+    flex:1 1 130px;font-family:"Space Mono",monospace;font-size:17px;font-weight:700;
+    padding:13px 16px;border-radius:12px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
   }
-  .buy-row .unit{
-    display:flex;align-items:center;font-weight:900;font-size:15px;padding:0 4px;
-  }
+  .buy-row .unit{display:flex;align-items:center;font-weight:900;font-size:15px;padding:0 4px}
   .btn{
     font-family:inherit;font-weight:900;cursor:pointer;text-decoration:none;
     border:3px solid var(--ink);border-radius:999px;
@@ -121,23 +134,27 @@
     display:inline-block;text-align:center;
   }
   .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
-  .btn-connect{width:100%;margin-top:12px;padding:14px;font-size:16px;background:var(--ink);color:#fff}
-  .btn-buy{width:100%;margin-top:10px;padding:15px;font-size:17px;background:var(--orange);color:#fff}
-  .btn-buy:disabled{opacity:.45;cursor:not-allowed;box-shadow:2px 2px 0 var(--ink)}
+  .btn-buy{width:100%;margin-top:12px;padding:15px;font-size:17px;background:var(--orange);color:#fff;letter-spacing:.03em}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .chipbtn{
-    font-family:inherit;font-weight:800;font-size:13.5px;cursor:pointer;
-    border:2.5px solid var(--ink);border-radius:999px;padding:6px 13px;background:#FFF3E2;
+    font-family:"Space Mono",monospace;font-weight:700;font-size:13.5px;cursor:pointer;
+    border:2.5px solid var(--ink);border-radius:999px;padding:6px 13px;background:var(--cream);color:var(--ink);
   }
   .chipbtn:active{background:var(--sun)}
   .quote{margin-top:12px;font-weight:900;font-size:16.5px;min-height:22px}
-  .quote small{display:block;font-weight:700;font-size:12.5px;color:#8A7658;margin-top:2px}
-  .buy-note{margin-top:10px;font-size:13px;font-weight:700;color:#8A7658}
-  /* giveaway rail */
-  .rail{margin-top:18px;position:relative}
+  .quote small{display:block;font-weight:600;font-size:12.5px;color:#8A7658;margin-top:2px}
+  .buy-note{margin-top:10px;font-size:13px;font-weight:600;color:#8A7658}
+  /* ---------- giveaway ticket ---------- */
+  .ticket{
+    background:var(--cream);color:var(--ink);border-radius:20px;
+    box-shadow:10px 12px 0 rgba(46,196,182,.85);
+    padding:26px 24px 8px;position:relative;
+  }
+  .ticket .intro{font-size:15.5px;line-height:1.55;font-weight:600;max-width:500px}
+  .rail{margin-top:20px;position:relative}
   .rail:before{
     content:"";position:absolute;left:19px;top:12px;bottom:12px;width:3px;
-    background:repeating-linear-gradient(#6B5844 0 7px,transparent 7px 14px);
+    background:repeating-linear-gradient(var(--sand) 0 7px,transparent 7px 14px);
   }
   .task{
     position:relative;display:flex;gap:14px;align-items:flex-start;
@@ -145,30 +162,54 @@
   }
   .task .num{
     flex:0 0 auto;width:40px;height:40px;border-radius:50%;z-index:1;
-    background:#322920;border:3px solid #6B5844;color:#fff;
+    background:#fff;border:3px solid var(--ink);color:var(--ink);
     display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;
+    font-family:"Space Mono",monospace;
     transition:background .15s,border-color .15s;
   }
-  a.task:hover .num{border-color:var(--sun)}
-  a.task.done .num{background:#0B7A55;border-color:#0B7A55}
-  .task .txt strong{display:block;font-size:16.5px;color:#fff;padding-top:2px}
-  .task .txt span{font-size:13.5px;line-height:1.45;color:#D8C9AE;font-weight:600}
+  a.task:hover .num{border-color:var(--orange-deep)}
+  a.task.done .num{background:#0B7A55;border-color:#0B7A55;color:#fff}
+  .task .txt{flex:1;min-width:0}
+  .task .txt strong{display:block;font-size:16.5px;color:var(--ink);padding-top:2px}
+  .task .txt span{font-size:13.5px;line-height:1.45;color:var(--brown);font-weight:600}
   .task .open{
     margin-left:auto;flex:0 0 auto;font-size:12px;font-weight:900;letter-spacing:.12em;
-    color:var(--sun);padding-top:6px;
+    color:var(--orange-deep);padding-top:6px;font-family:"Space Mono",monospace;
   }
-  a.task.done .open{color:#4ADE80}
-  /* wallet form inside give panel */
-  .wallet-form{
-    margin-top:16px;background:var(--paper);color:var(--ink);
-    border-radius:18px;padding:18px 16px;
+  a.task.done .open{color:#0B7A55}
+  .task .txt .tpl-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+  .tpl-actions a{
+    font-family:inherit;font-weight:900;font-size:13.5px;cursor:pointer;text-decoration:none;
+    padding:10px 17px;border-radius:999px;border:2.5px solid var(--ink);
+    background:var(--orange);color:#fff;box-shadow:3px 3px 0 var(--ink);
   }
+  .task .txt .verify-inline{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+  .verify-inline input{
+    flex:1 1 200px;font-family:inherit;font-size:15px;font-weight:700;
+    padding:13px 15px;border-radius:999px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
+  }
+  .verify-inline button{
+    font-family:inherit;font-weight:900;font-size:15px;cursor:pointer;
+    padding:13px 20px;border-radius:999px;border:3px solid var(--ink);
+    background:var(--orange);color:#fff;box-shadow:3px 3px 0 var(--ink);
+  }
+  .task .txt .wallet-msg{display:block;color:var(--brown)}
+  .task .txt .wallet-msg.ok{color:#0B7A55}
+  .task .txt .wallet-msg.err{color:#C62F0E}
+  /* tear-off stub */
+  .stub-sep{position:relative;border-top:3px dashed var(--sand);margin:20px -24px 0}
+  .stub-sep:before,.stub-sep:after{
+    content:"";position:absolute;top:-13px;width:26px;height:26px;border-radius:50%;background:var(--bg);
+  }
+  .stub-sep:before{left:-38px}
+  .stub-sep:after{right:-38px}
+  .wallet-form{padding:20px 0 22px}
   .wallet-form strong{font-size:16px;font-weight:900;letter-spacing:.02em}
-  .wallet-form p{color:#5C4B36;font-size:13.5px;margin-top:4px}
+  .wallet-form p{color:var(--brown);font-size:13.5px;margin-top:4px;font-weight:600}
   .wallet-form form{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
   .wallet-form input{
     flex:1 1 200px;font-family:inherit;font-size:15px;font-weight:700;
-    padding:13px 15px;border-radius:999px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;
+    padding:13px 15px;border-radius:999px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
   }
   .wallet-form button{
     font-family:inherit;font-weight:900;font-size:15px;cursor:pointer;
@@ -178,48 +219,19 @@
   .wallet-msg{margin-top:10px;font-weight:800;font-size:14px;min-height:18px}
   .wallet-msg.ok{color:#0B7A55}
   .wallet-msg.err{color:#C62F0E}
-  .wallet-form.locked{opacity:.55}
+  .wallet-form.locked{opacity:.5}
   .wallet-form.locked input,.wallet-form.locked button{cursor:not-allowed}
-  #lockTag{font-size:12px;letter-spacing:.1em;color:#C62F0E}
+  #lockTag{font-size:12px;letter-spacing:.1em;color:#C62F0E;font-family:"Space Mono",monospace}
   #lockTag.open{color:#0B7A55}
-  /* giveaway template box */
-  .task .txt .tpl-box{
-    display:block;margin-top:10px;background:var(--paper);color:var(--ink);
-    border-radius:14px;padding:13px 14px;font-size:14px;line-height:1.55;font-weight:700;
-    white-space:pre-wrap;word-break:break-word;
-  }
-  .task .txt .tpl-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .tpl-actions button,.tpl-actions a{
-    font-family:inherit;font-weight:900;font-size:13px;cursor:pointer;text-decoration:none;
-    padding:9px 15px;border-radius:999px;border:2.5px solid var(--ink);color:var(--ink);background:#fff;
-  }
-  .tpl-actions a{background:var(--orange);color:#fff}
-  /* inline verify field in the rail (step 3) */
-  .task .txt .verify-inline{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .verify-inline input{
-    flex:1 1 200px;font-family:inherit;font-size:15px;font-weight:700;
-    padding:13px 15px;border-radius:999px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
-  }
-  .verify-inline button{
-    font-family:inherit;font-weight:900;font-size:15px;cursor:pointer;
-    padding:13px 20px;border-radius:999px;border:3px solid var(--ink);
-    background:var(--orange);color:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.55);
-  }
-  .task .txt .wallet-msg{display:block;color:#EBDCC2}
-  .task .txt .wallet-msg.ok{color:#4ADE80}
-  .task .txt .wallet-msg.err{color:#FF9A7A}
-  /* ---------- CA band ---------- */
-  .ca-band{
-    margin-top:34px;background:var(--ink);color:var(--paper);
-    padding:26px 18px;text-align:center;
-  }
-  .ca-band small{display:block;font-weight:800;letter-spacing:.26em;font-size:11px;color:var(--sun);margin-bottom:8px}
-  .ca-band .ca{font-size:clamp(14px,3.2vw,19px);font-weight:800;word-break:break-all}
-  .ca-band .ca em{font-style:normal;color:#A08B6C}
+  section{margin-bottom:46px}
+  /* ---------- CA ---------- */
+  .ca-band{text-align:center;padding:38px 18px 10px}
+  .ca-band small{display:block;font-family:"Space Mono",monospace;font-weight:700;letter-spacing:.3em;font-size:11px;color:var(--sun);margin-bottom:12px}
+  .ca-band .ca{font-family:"Space Mono",monospace;font-size:clamp(13.5px,3.4vw,19px);font-weight:700;word-break:break-all;color:var(--cream)}
   footer{
-    text-align:center;padding:26px 18px 34px;font-weight:700;color:#7A6A55;font-size:14.5px;line-height:1.7;
+    text-align:center;padding:22px 18px 38px;font-weight:600;color:var(--mut);font-size:14.5px;line-height:1.7;
   }
-  footer a{color:var(--orange-deep);text-decoration:none;font-weight:900}
+  footer a{color:var(--orange);text-decoration:none;font-weight:900}
 </style>
 </head>
 <body>
@@ -232,88 +244,101 @@
 </nav>
 
 <header class="hero">
-  <div>
+  <canvas id="dotfield"></canvas>
+  <div class="hero-inner">
     <span class="kicker">ROBINHOOD CHAIN · FAIR LAUNCH ON PONS</span>
     <h1>ONE LITTLE<br>DOT<span class="o">.</span><br>BIG CHAIN ENERGY<span class="o">.</span></h1>
     <p class="sub">Dotgent is the round little agent living on Robinhood Chain. No presale, no waiting room — it launched fair on Pons, and trading is live right now.</p>
     <div class="meta">
       <span class="hot">$DGTG</span><span>CHAIN: ROBINHOOD</span><span>LAUNCHPAD: PONS</span><span>PRESALE: NONE</span>
     </div>
-  </div>
-  <div class="mascot-arch">
-    <div class="arch"><img src="mascot.webp" alt="Dotgent — the round dot agent"></div>
-    <span class="orbit o1"></span><span class="orbit o2"></span><span class="orbit o3"></span>
+    <div class="mascot-wrap">
+      <div class="ring"><img src="mascot.webp" alt="Dotgent — the round dot agent"></div>
+      <span class="tag">EST. BLOCK 1</span>
+    </div>
   </div>
 </header>
 
-<main class="panels">
-  <!-- BUY PANEL -->
-  <section class="panel panel-buy" id="buy">
-    <h2>BUY $DGTG <span class="tag">ON PONS</span></h2>
-    <p>Trading is live on the Pons launchpad. Check the quote here, tap through, buy there — the tokens land straight in your wallet.</p>
-    <div class="buy-box">
-      <div class="buy-row">
-        <input type="text" inputmode="decimal" placeholder="0.0005" id="buyAmount" value="0.0005" autocomplete="off">
-        <span class="unit">ETH</span>
+<div class="marquee" aria-hidden="true">
+  <div class="track">
+    <span>$DGTG ✦ ROBINHOOD CHAIN ✦ FAIR LAUNCH ✦ NO PRESALE ✦ LIVE ON PONS ✦ ONE DOT ✦&nbsp;</span>
+    <span>$DGTG ✦ ROBINHOOD CHAIN ✦ FAIR LAUNCH ✦ NO PRESALE ✦ LIVE ON PONS ✦ ONE DOT ✦&nbsp;</span>
+  </div>
+</div>
+
+<main>
+  <!-- BUY -->
+  <section id="buy">
+    <div class="sec-head"><span class="no">01</span><h2>Buy $DGTG</h2><span class="tag">ON PONS</span></div>
+    <div class="buy-card">
+      <p>Trading is live on the Pons launchpad. Check the quote here, tap through, buy there — the tokens land straight in your wallet.</p>
+      <div class="buy-box">
+        <div class="buy-row">
+          <input type="text" inputmode="decimal" placeholder="0.0005" id="buyAmount" value="0.0005" autocomplete="off">
+          <span class="unit">ETH</span>
+        </div>
+        <div class="chips">
+          <button type="button" class="chipbtn" data-amt="0.0001">0.0001</button>
+          <button type="button" class="chipbtn" data-amt="0.0003">0.0003</button>
+          <button type="button" class="chipbtn" data-amt="0.0005">0.0005</button>
+          <button type="button" class="chipbtn" data-amt="0.0008">0.0008</button>
+        </div>
+        <div class="quote" id="quoteLine">Enter an amount to see how much $DGTG you get.</div>
+        <a class="btn btn-buy" href="https://ponsfamily.com/launchpad/0x8193aD27443Fde06589987d8c668C0AD92185F4A" target="_blank" rel="noopener" style="display:block;text-decoration:none">BUY $DGTG ON PONS</a>
+        <div class="buy-note" id="buyNote">Trading is LIVE on the Pons curve — tap the button and buy on the launchpad, straight from your wallet.</div>
       </div>
-      <div class="chips">
-        <button type="button" class="chipbtn" data-amt="0.0001">0.0001</button>
-        <button type="button" class="chipbtn" data-amt="0.0003">0.0003</button>
-        <button type="button" class="chipbtn" data-amt="0.0005">0.0005</button>
-        <button type="button" class="chipbtn" data-amt="0.0008">0.0008</button>
-      </div>
-      <div class="quote" id="quoteLine">Enter an amount to see how much $DGTG you get.</div>
-      <a class="btn btn-buy" href="https://ponsfamily.com/launchpad/0x8193aD27443Fde06589987d8c668C0AD92185F4A" target="_blank" rel="noopener" style="display:block;text-decoration:none">BUY $DGTG ON PONS</a>
-      <div class="buy-note" id="buyNote">Trading is LIVE on the Pons curve — tap the button and buy on the launchpad, straight from your wallet.</div>
     </div>
   </section>
 
-  <!-- GIVEAWAY PANEL -->
-  <section class="panel panel-give" id="giveaway">
-    <h2>LAUNCH GIVEAWAY <span class="tag">FREE $DGTG</span></h2>
-    <p>Follow, like, repost, post the template — then verify your post and drop your wallet. Winners are picked from all verified entries after launch.</p>
-    <div class="rail">
-      <a class="task" href="https://x.com/intent/follow?screen_name=dotgent_" target="_blank" rel="noopener">
-        <span class="num">1</span>
-        <span class="txt"><strong>Follow @dotgent_</strong><span>Opens our X page — hit Follow there.</span></span>
-        <span class="open">OPEN →</span>
-      </a>
-      <a class="task" href="https://x.com/intent/like?tweet_id=2125983869853995405" target="_blank" rel="noopener">
-        <span class="num">2</span>
-        <span class="txt"><strong>Like the launch post</strong><span>Opens the post — drop a like on it.</span></span>
-        <span class="open">OPEN →</span>
-      </a>
-      <a class="task" href="https://x.com/intent/retweet?tweet_id=2125983869853995405" target="_blank" rel="noopener">
-        <span class="num">3</span>
-        <span class="txt"><strong>Repost it</strong><span>Same post — hit Repost so the dot travels.</span></span>
-        <span class="open">OPEN →</span>
-      </a>
-      <div class="task">
-        <span class="num" id="tplNum">4</span>
-        <span class="txt">
-          <span class="tpl-actions">
-            <a id="postTplBtn" href="#" target="_blank" rel="noopener">POST IT ON X →</a>
+  <!-- GIVEAWAY -->
+  <section id="giveaway">
+    <div class="sec-head"><span class="no">02</span><h2>Launch Giveaway</h2><span class="tag">FREE $DGTG</span></div>
+    <div class="ticket">
+      <p class="intro">Follow, like, repost, post the template — then verify your post and drop your wallet. Winners are picked from all verified entries after launch.</p>
+      <div class="rail">
+        <a class="task" href="https://x.com/intent/follow?screen_name=dotgent_" target="_blank" rel="noopener">
+          <span class="num">1</span>
+          <span class="txt"><strong>Follow @dotgent_</strong><span>Opens our X page — hit Follow there.</span></span>
+          <span class="open">OPEN →</span>
+        </a>
+        <a class="task" href="https://x.com/intent/like?tweet_id=2125983869853995405" target="_blank" rel="noopener">
+          <span class="num">2</span>
+          <span class="txt"><strong>Like the launch post</strong><span>Opens the post — drop a like on it.</span></span>
+          <span class="open">OPEN →</span>
+        </a>
+        <a class="task" href="https://x.com/intent/retweet?tweet_id=2125983869853995405" target="_blank" rel="noopener">
+          <span class="num">3</span>
+          <span class="txt"><strong>Repost it</strong><span>Same post — hit Repost so the dot travels.</span></span>
+          <span class="open">OPEN →</span>
+        </a>
+        <div class="task">
+          <span class="num" id="tplNum">4</span>
+          <span class="txt">
+            <span class="tpl-actions">
+              <a id="postTplBtn" href="#" target="_blank" rel="noopener">POST IT ON X →</a>
+            </span>
+            <form id="proofForm" class="verify-inline">
+              <input type="text" id="proofInput" placeholder="https://x.com/you/status/…" autocomplete="off" spellcheck="false">
+              <button type="submit" id="proofBtn">VERIFY</button>
+            </form>
+            <span class="wallet-msg" id="proofMsg"></span>
           </span>
-          <form id="proofForm" class="verify-inline">
-            <input type="text" id="proofInput" placeholder="https://x.com/you/status/…" autocomplete="off" spellcheck="false">
-            <button type="submit" id="proofBtn">VERIFY</button>
-          </form>
-          <span class="wallet-msg" id="proofMsg"></span>
-        </span>
+        </div>
+        <div class="task">
+          <span class="num">5</span>
+          <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies. That's your ticket.</span></span>
+        </div>
       </div>
-      <div class="task">
-        <span class="num">5</span>
-        <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies. That's your ticket.</span></span>
+      <div class="stub-sep"></div>
+      <div class="wallet-form locked" id="walletBox">
+        <strong>YOUR EVM WALLET <span id="lockTag">🔒 LOCKED</span></strong>
+        <p>One entry per wallet. This is where your prize goes if you win.</p>
+        <form id="walletForm">
+          <input type="text" id="walletInput" placeholder="0x… your EVM wallet address" autocomplete="off" spellcheck="false" disabled>
+          <button type="submit" id="walletBtn" disabled>ENTER</button>
+        </form>
+        <div class="wallet-msg" id="walletMsg"></div>
       </div>
-    </div>
-    <div class="wallet-form locked" id="walletBox">
-      <strong>YOUR EVM WALLET <span id="lockTag">🔒 LOCKED</span></strong>
-      <p>One entry per wallet. This is where your prize goes if you win.</p>
-      <form id="walletForm">
-        <input type="text" id="walletInput" placeholder="0x… your EVM wallet address" autocomplete="off" spellcheck="false" disabled>
-        <button type="submit" id="walletBtn" disabled>ENTER</button>
-      </form>
-      <div class="wallet-msg" id="walletMsg"></div>
     </div>
   </section>
 </main>
@@ -329,7 +354,7 @@
 </footer>
 
 <script>
-  // giveaway tasks: mark done when tapped
+// giveaway tasks: mark done when tapped
   document.querySelectorAll('a.task').forEach(function (a) {
     a.addEventListener('click', function () {
       a.classList.add('done');
@@ -565,6 +590,38 @@
   });
 
   refreshQuote();
+</script>
+<script>
+  // hero dot field: tiny dots drifting up, twinkling
+  (function () {
+    var c = document.getElementById('dotfield');
+    if (!c) return;
+    var x = c.getContext('2d');
+    var W, H, dots = [];
+    function rs() { W = c.width = c.offsetWidth; H = c.height = c.offsetHeight; }
+    rs(); addEventListener('resize', rs);
+    for (var i = 0; i < 46; i++) dots.push({
+      x: Math.random(), y: Math.random(),
+      r: Math.random() * 2.2 + 0.6,
+      s: Math.random() * 0.00045 + 0.00012,
+      o: Math.random() * 0.5 + 0.15,
+      p: Math.random() * 6.28
+    });
+    (function loop(t) {
+      x.clearRect(0, 0, W, H);
+      for (var i = 0; i < dots.length; i++) {
+        var d = dots[i];
+        d.y -= d.s;
+        if (d.y < -0.02) { d.y = 1.02; d.x = Math.random(); }
+        var tw = 0.55 + 0.45 * Math.sin(t / 900 + d.p);
+        x.beginPath();
+        x.arc(d.x * W, d.y * H, d.r, 0, 6.29);
+        x.fillStyle = 'rgba(255,150,60,' + (d.o * tw).toFixed(3) + ')';
+        x.fill();
+      }
+      requestAnimationFrame(loop);
+    })(0);
+  })();
 </script>
 </body>
 </html>
