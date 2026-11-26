@@ -658,6 +658,25 @@
         throw err;
       });
   }
+  function waitForChain(p, tries) {
+    // Poll eth_chainId until Robinhood Chain shows up. Over WalletConnect
+    // many wallets apply a network switch but never answer the switch
+    // request itself — awaiting it froze the buy on CHECKING forever.
+    function read() {
+      return Promise.race([
+        p.request({ method: 'eth_chainId' }),
+        new Promise(function (_, rej) { setTimeout(function () { rej(new Error('slow')); }, 6000); })
+      ]);
+    }
+    return read().then(function (cid) {
+      if (cid === CHAIN_ID_HEX) return true;
+      if (tries <= 0) return false;
+      return new Promise(function (res) { setTimeout(res, 1500); }).then(function () { return waitForChain(p, tries - 1); });
+    }).catch(function () {
+      if (tries <= 0) return false;
+      return new Promise(function (res) { setTimeout(res, 1500); }).then(function () { return waitForChain(p, tries - 1); });
+    });
+  }
   function showConnected() {
     $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
     $('buyBtn').disabled = false;
@@ -707,10 +726,10 @@
     $('buyBtn').textContent = 'CHECKING…';
     provider.request({ method: 'eth_chainId' }).then(function (cid) {
       if (cid === CHAIN_ID_HEX) return cid;
-      $('buyNote').textContent = 'Asking your wallet to switch to Robinhood Chain — approve it in your wallet app.';
-      return switchToRH(provider).then(function () {
-        return provider.request({ method: 'eth_chainId' });
-      });
+      $('buyNote').textContent = 'Asking your wallet to switch to Robinhood Chain — approve it in your wallet app, then come back to this tab.';
+      // Fire-and-forget: never await the switch request (see waitForChain).
+      switchToRH(provider).catch(function () {});
+      return waitForChain(provider, 24).then(function (ok) { return ok ? CHAIN_ID_HEX : '0x0'; });
     }).then(function (cid) {
       if (cid !== CHAIN_ID_HEX) {
         $('buyNote').textContent = 'Still on the wrong network — switch to Robinhood Chain in your wallet, then tap BUY again.';
