@@ -201,7 +201,7 @@
   <div>
     <span class="kicker">ROBINHOOD CHAIN · FAIR LAUNCH ON PONS</span>
     <h1>ONE LITTLE<br>DOT<span class="o">.</span><br>BIG CHAIN ENERGY<span class="o">.</span></h1>
-    <p class="sub">Dotgent is the round little agent living on Robinhood Chain. No presale, no waiting room — it launches fair, and you can buy it right here on this page.</p>
+    <p class="sub">Dotgent is the round little agent living on Robinhood Chain. No presale, no waiting room — it launched fair on Pons, and trading is live right now.</p>
     <div class="meta">
       <span class="hot">$DGTG</span><span>CHAIN: ROBINHOOD</span><span>LAUNCHPAD: PONS</span><span>PRESALE: NONE</span>
     </div>
@@ -216,15 +216,15 @@
   <!-- BUY PANEL -->
   <section class="panel panel-buy" id="buy">
     <h2>BUY $DGTG <span class="tag">RIGHT HERE</span></h2>
-    <p>No detours. Connect your wallet, type an amount, done — the tokens land straight in your wallet.</p>
+    <p>Trading is live on the Pons curve. Tap BUY to open the Dotgent trading page and grab your $DGTG.</p>
     <div class="buy-box">
       <div class="buy-row">
         <input type="text" inputmode="decimal" placeholder="0.01" id="buyAmount" autocomplete="off">
         <span class="unit">ETH</span>
       </div>
       <button class="btn btn-connect" id="connectBtn" type="button">CONNECT WALLET</button>
-      <button class="btn btn-buy" id="buyBtn" type="button">BUY $DGTG</button>
-      <div class="buy-note" id="buyNote">Trading opens the moment Dotgent launches on Pons.</div>
+      <a class="btn btn-buy" href="https://ponsfamily.com/launchpad/0x8193aD27443Fde06589987d8c668C0AD92185F4A" target="_blank" rel="noopener">BUY $DGTG</a>
+      <div class="buy-note" id="buyNote">Trading is LIVE — tap BUY to open the Dotgent page on Pons.</div>
     </div>
   </section>
 
@@ -276,7 +276,7 @@
 
 <div class="ca-band">
   <small>CONTRACT ADDRESS</small>
-  <div class="ca"><em>Drops at launch — the only official address appears here and on @dotgent_. Trust nothing else.</em></div>
+  <div class="ca">0x8193aD27443Fde06589987d8c668C0AD92185F4A</div>
 </div>
 
 <footer>
@@ -333,12 +333,9 @@
     }
   });
 
-  // buy panel placeholder state (activates at launch)
+  // buy panel: on-site wallet buying is the next upgrade; BUY already trades on Pons
   document.getElementById('connectBtn').addEventListener('click', function () {
-    document.getElementById('buyNote').textContent = 'Wallet connect opens at launch — the dot is still getting dressed.';
-  });
-  document.getElementById('buyBtn').addEventListener('click', function () {
-    document.getElementById('buyNote').textContent = 'Trading opens the moment Dotgent launches on Pons. Follow @dotgent_ so you don\'t miss it.';
+    document.getElementById('buyNote').textContent = 'On-site wallet buying is coming to this page — for now, tap BUY to trade on Pons.';
   });
 </script>
 </body>
