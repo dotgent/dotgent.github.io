@@ -391,13 +391,25 @@
   function encodeBuy(amountWei, minOut, addr) {
     return '0x' + BUY_SEL + pad32(amountWei) + pad32(minOut) + padAddr(addr);
   }
+  function ethCall(to, data, fromAddr, valueHex) {
+    var callObj = { to: to, data: data };
+    if (fromAddr) callObj.from = fromAddr;
+    if (valueHex) callObj.value = valueHex;
+    // Once a wallet is connected, route reads through the wallet itself —
+    // wallet-app browsers can block direct RPC fetches from pages.
+    if (provider && account) {
+      return provider.request({ method: 'eth_call', params: [callObj, 'latest'] })
+        .then(function (hex) { return (hex && hex !== '0x') ? hex : null; })
+        .catch(function () { return null; });
+    }
+    return rpc('eth_call', [callObj, 'latest'])
+      .then(function (res) { return (res.result && res.result !== '0x') ? res.result : null; })
+      .catch(function () { return null; });
+  }
   function quoteBuy(amountWei, fromAddr) {
     var data = encodeBuy(amountWei, 0n, fromAddr);
-    return rpc('eth_call', [{ to: CURVE, from: fromAddr, value: '0x' + amountWei.toString(16), data: data }, 'latest'])
-      .then(function (res) {
-        if (res.result && res.result !== '0x') return BigInt(res.result);
-        return null;
-      }).catch(function () { return null; });
+    return ethCall(CURVE, data, fromAddr, '0x' + amountWei.toString(16))
+      .then(function (hex) { return hex ? BigInt(hex) : null; });
   }
   function findMax(amountWei, fromAddr) {
     var cur = amountWei;
@@ -414,9 +426,8 @@
     return step();
   }
   function tokenBalance(addr) {
-    return rpc('eth_call', [{ to: TOKEN, data: '0x' + BAL_SEL + padAddr(addr) }, 'latest'])
-      .then(function (res) { return res.result ? BigInt(res.result) : 0n; })
-      .catch(function () { return 0n; });
+    return ethCall(TOKEN, '0x' + BAL_SEL + padAddr(addr), null, null)
+      .then(function (hex) { return hex ? BigInt(hex) : 0n; });
   }
   function refreshQuote() {
     var wei = parseEth($('buyAmount').value);
@@ -561,7 +572,10 @@
         var tries = 0;
         (function poll() {
           tries++;
-          rpc('eth_getTransactionReceipt', [hash]).then(function (res) {
+          var getReceipt = (provider && account)
+            ? provider.request({ method: 'eth_getTransactionReceipt', params: [hash] }).then(function (r) { return { result: r }; }).catch(function () { return {}; })
+            : rpc('eth_getTransactionReceipt', [hash]);
+          getReceipt.then(function (res) {
             if (res.result) {
               if (res.result.status === '0x1') {
                 $('buyNote').textContent = 'Done — the $DGTG is in your wallet. Welcome to the dots 🟠';
