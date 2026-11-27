@@ -4,108 +4,167 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DOTGENT NFT — The Hooded Agents</title>
+<meta name="description" content="3,000 sealed hooded archers on Robinhood Chain. Every mint is sealed until the reveal. One 1/1 Hooded King.">
 <style>
+  @font-face { font-family:'Marker'; src:url('fonts/PermanentMarker.ttf') format('truetype'); }
+  @font-face { font-family:'Hand'; src:url('fonts/PatrickHand.ttf') format('truetype'); }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#07090a; color:#e8e6df; font-family:'Segoe UI', Arial, sans-serif; }
-  .topbar { display:flex; justify-content:space-between; align-items:center; padding:18px 28px; border-bottom:1px solid #1e2a24; }
-  .logo { font-weight:900; font-size:22px; letter-spacing:2px; color:#f5f2e9; }
-  .logo span { color:#e8862e; }
-  .topbar .tags { font-size:12px; letter-spacing:2px; color:#8fae9d; }
-  .hero { display:flex; gap:40px; padding:56px 28px 40px; max-width:1200px; margin:0 auto; align-items:center; flex-wrap:wrap; }
-  .hero-text { flex:1 1 420px; }
-  .kicker { color:#39d98a; letter-spacing:4px; font-size:13px; font-weight:700; margin-bottom:14px; }
-  h1 { font-size:64px; line-height:.95; font-weight:900; letter-spacing:1px; }
-  h1 .gold { color:#e8b23a; }
-  .sub { margin-top:18px; font-size:17px; line-height:1.55; color:#b9c4bc; max-width:480px; }
-  .hero-img { flex:0 1 400px; }
-  .hero-img img { width:100%; border-radius:18px; border:1px solid #2c3a32; box-shadow:0 30px 80px rgba(0,0,0,.6); }
-  .sealed-note { text-align:center; font-size:12px; letter-spacing:2px; color:#8fae9d; margin-top:10px; }
-  .mintbox { max-width:1200px; margin:10px auto 0; padding:0 28px; }
-  .mint-inner { background:#0d120e; border:1px solid #223028; border-radius:20px; padding:28px; display:flex; gap:28px; flex-wrap:wrap; align-items:center; }
-  .supply { flex:1 1 260px; }
-  .supply .num { font-size:44px; font-weight:900; }
-  .supply .num small { font-size:20px; color:#8fae9d; }
-  .bar { height:10px; background:#1a241e; border-radius:99px; margin-top:12px; overflow:hidden; }
-  .bar i { display:block; height:100%; width:0%; background:linear-gradient(90deg,#39d98a,#e8b23a); }
-  .supply .lbl { font-size:12px; letter-spacing:2px; color:#8fae9d; margin-top:8px; }
-  .phases { flex:2 1 420px; display:flex; gap:12px; flex-wrap:wrap; }
-  .phase { flex:1 1 120px; border:1px solid #2c3a32; border-radius:14px; padding:14px; background:#0a0e0b; }
-  .phase b { display:block; font-size:15px; letter-spacing:1px; }
-  .phase span { font-size:12px; color:#8fae9d; line-height:1.4; display:block; margin-top:4px; }
-  .phase .price { color:#39d98a; font-weight:800; font-size:14px; margin-top:8px; }
-  .phase.active { border-color:#e8862e; }
-  .mintbtn { flex:0 1 220px; text-align:center; }
-  .mintbtn button { width:100%; padding:18px; font-size:17px; font-weight:900; letter-spacing:1px; border:none; border-radius:14px; background:#39413c; color:#9aa79e; cursor:not-allowed; }
-  .mintbtn p { font-size:12px; color:#8fae9d; margin-top:10px; letter-spacing:1px; }
-  .section { max-width:1200px; margin:0 auto; padding:56px 28px 8px; }
-  .section h2 { font-size:30px; font-weight:900; letter-spacing:1px; }
-  .section h2 span { color:#e8862e; }
-  .section p.lead { color:#b9c4bc; margin-top:8px; font-size:15px; }
-  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin-top:24px; }
-  .card { background:#0d120e; border:1px solid #223028; border-radius:16px; overflow:hidden; }
-  .card img { width:100%; display:block; }
-  .card .meta { padding:14px 16px; }
-  .card .tier { font-size:11px; letter-spacing:3px; font-weight:800; }
-  .card .desc { font-size:13px; color:#b9c4bc; margin-top:6px; line-height:1.5; }
-  .t-common { color:#8fae9d; } .t-rare { color:#39c2d9; } .t-legend { color:#e8b23a; } .t-one { color:#ff7847; }
-  .wide { display:flex; flex-wrap:wrap; margin-top:18px; background:linear-gradient(120deg,#141005,#0d120e); border:1px solid #4a3a14; border-radius:16px; overflow:hidden; }
-  .wide img { width:300px; max-width:100%; display:block; }
-  .wide .meta { padding:24px; flex:1 1 300px; }
-  .wide .meta h3 { font-size:24px; font-weight:900; }
-  .reveal { max-width:1200px; margin:0 auto; padding:48px 28px 60px; text-align:center; }
-  .reveal .box { border:1px dashed #2c3a32; border-radius:20px; padding:36px 24px; }
-  .reveal h2 { font-size:28px; font-weight:900; }
-  .reveal p { color:#b9c4bc; margin-top:10px; font-size:15px; line-height:1.6; max-width:640px; margin-left:auto; margin-right:auto; }
-  footer { border-top:1px solid #1e2a24; padding:22px 28px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12px; letter-spacing:1px; color:#8fae9d; }
-  @media (max-width:640px){ h1{font-size:44px;} .hero{padding-top:36px;} }
-body::after { content:""; position:fixed; right:-70px; bottom:-30px; width:min(92vw,620px); height:min(92vw,620px); background:url(bg-silhouette.webp) no-repeat center/contain; opacity:.13; mix-blend-mode:screen; pointer-events:none; z-index:0; animation:drift 16s ease-in-out infinite alternate; }
-@keyframes drift { from { transform:translateY(0) } to { transform:translateY(-16px) } }
-.topbar, .hero, .mint, .reveal, footer { position:relative; z-index:1; }
+  html { scroll-behavior:smooth; }
+  body { background:#0b0a08; color:#efe9da; font-family:'Hand', 'Segoe UI', sans-serif; overflow-x:hidden;
+    background-image:radial-gradient(ellipse 80% 420px at 50% -60px, rgba(255,166,47,.13), transparent 70%); }
+  body::after { content:""; position:fixed; right:-70px; bottom:-30px; width:min(92vw,620px); height:min(92vw,620px);
+    background:url(bg-silhouette.webp) no-repeat center/contain; opacity:.12; mix-blend-mode:screen; pointer-events:none; z-index:0;
+    animation:drift 16s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform:translateY(0) } to { transform:translateY(-16px) } }
+  .wrap { position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 18px 46px; }
+
+  /* ── wooden sign topbar ── */
+  .topbar { margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:14px 22px; color:#f3e9cf;
+    background:linear-gradient(180deg,#4a3220 0%,#3a2a16 55%,#2e2010 100%);
+    border:3px solid #1c1206; border-radius:14px 4px 16px 5px/5px 16px 4px 14px;
+    box-shadow:7px 7px 0 rgba(0,0,0,.55), inset 0 0 0 2px rgba(243,233,207,.08); transform:rotate(-.3deg); }
+  .logo { font-family:'Marker', cursive; font-size:27px; letter-spacing:1px; color:#f7f1de; text-shadow:3px 3px 0 rgba(0,0,0,.45); }
+  .logo span { color:#ffa62f; }
+  .topbar .tags { font-size:15px; letter-spacing:2.5px; color:#d8c9a3; }
+
+  .rope { height:0; border-top:4px dashed #6b543a; margin:26px 6px 0; opacity:.7; }
+
+  /* ── hero ── */
+  .hero { display:flex; gap:44px; padding:44px 6px 8px; align-items:center; flex-wrap:wrap; }
+  .hero-text { flex:1 1 430px; }
+  .sticker { display:inline-block; font-family:'Marker', cursive; font-size:15px; letter-spacing:1.5px; color:#0d2013;
+    background:#3ecf6f; padding:8px 16px 7px; transform:rotate(-2.5deg);
+    border-radius:4px 14px 5px 15px/15px 5px 14px 4px; box-shadow:5px 5px 0 rgba(0,0,0,.55); }
+  h1 { font-family:'Marker', cursive; font-weight:400; font-size:clamp(46px,7.4vw,84px); line-height:1.04; margin-top:20px;
+    color:#f7f1de; text-shadow:5px 5px 0 rgba(0,0,0,.5); transform:rotate(-.6deg); }
+  h1 .gold { color:#ffb52e; }
+  .sub { margin-top:20px; font-size:20px; line-height:1.55; color:#cfc7ae; max-width:490px; }
+  .sub b { color:#ffb52e; }
+  .scribble { margin-top:18px; font-size:17px; color:#8fae9d; transform:rotate(-.8deg); }
+  .scribble .arr { color:#ffb52e; font-size:20px; }
+
+  .hero-img { flex:0 1 400px; position:relative; transform:rotate(2deg); }
+  .photo { background:#f3ecd7; padding:14px 14px 12px; border-radius:6px 3px 8px 4px;
+    box-shadow:10px 12px 0 rgba(0,0,0,.5); position:relative; }
+  .photo img { width:100%; display:block; border-radius:3px; }
+  .photo::before, .photo::after { content:""; position:absolute; width:110px; height:30px; background:rgba(233,220,170,.75);
+    border-left:2px dashed rgba(120,100,50,.35); border-right:2px dashed rgba(120,100,50,.35); z-index:2; }
+  .photo::before { top:-14px; left:26px; transform:rotate(-7deg); }
+  .photo::after { top:-14px; right:26px; transform:rotate(6deg); }
+  .sealed-note { text-align:center; font-size:14.5px; letter-spacing:1.6px; color:#3a3125; margin-top:10px; }
+  .badge { position:absolute; right:-24px; bottom:34px; z-index:3; width:118px; height:118px; transform:rotate(10deg);
+    background:radial-gradient(circle,#ffc93d 0 58%,#e8a51c 60% 100%); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-family:'Marker', cursive; font-size:14.5px; line-height:1.25; color:#241703;
+    box-shadow:5px 6px 0 rgba(0,0,0,.5); border:3px dashed rgba(36,23,3,.5); }
+
+  /* ── mint board (parchment) ── */
+  .board { margin-top:52px; background:#efe3c0; color:#2b2113;
+    padding:30px 30px 26px; transform:rotate(-.35deg);
+    border-radius:18px 5px 20px 6px/6px 20px 5px 18px;
+    box-shadow:9px 10px 0 rgba(0,0,0,.55);
+    clip-path:polygon(0 1.5%, 4% 0, 22% .8%, 45% 0, 68% .9%, 88% 0, 100% 1.2%, 99.4% 30%, 100% 62%, 99.5% 100%, 76% 99.2%, 48% 100%, 24% 99.1%, 0 100%, .5% 66%, 0 34%); }
+  .board h2 { font-family:'Marker', cursive; font-weight:400; font-size:clamp(24px,3.6vw,34px); transform:rotate(-.5deg); }
+  .board h2 span { color:#b06f00; }
+  .board-row { display:flex; gap:30px; flex-wrap:wrap; align-items:center; margin-top:16px; }
+  .supply { flex:1 1 250px; }
+  .supply .num { font-family:'Marker', cursive; font-size:52px; line-height:1; }
+  .supply .num small { font-size:24px; color:#7a6743; }
+  .inkbar { height:20px; margin-top:12px; background:#d9c894;
+    border:3px solid #2b2113; border-radius:12px 4px 13px 5px/5px 13px 4px 12px; overflow:hidden; transform:rotate(-.4deg); }
+  .inkbar i { display:block; height:100%; width:0%;
+    background:repeating-linear-gradient(-45deg,#2fbf5a 0 14px,#27a34b 14px 28px); }
+  .supply .lbl { font-size:15px; letter-spacing:3px; margin-top:9px; color:#5d4c2c; }
+  .mintbtn { flex:0 1 300px; text-align:center; }
+  .osbtn { display:block; width:100%; padding:19px 14px; font-family:'Marker', cursive; font-size:21px; letter-spacing:.5px;
+    background:#2fbf5a; color:#0d2013; text-decoration:none; transform:rotate(-1.2deg);
+    border:3px solid #12351c; border-radius:16px 5px 18px 6px/6px 18px 5px 16px;
+    box-shadow:6px 7px 0 rgba(20,15,5,.75); transition:transform .12s, box-shadow .12s; }
+  .osbtn:hover { transform:rotate(-1.2deg) translate(-2px,-2px); box-shadow:9px 10px 0 rgba(20,15,5,.75); }
+  .mintbtn p { font-size:14.5px; color:#5d4c2c; margin-top:14px; letter-spacing:1.2px; }
+
+  /* ── sealed manifesto ── */
+  .reveal { margin-top:54px; text-align:center; padding:42px 26px 40px; position:relative;
+    border:3.5px dashed #8a6d2f; border-radius:225px 18px 255px 18px/18px 255px 18px 225px; background:rgba(255,182,46,.045); }
+  .qseal { width:74px; height:74px; margin:0 auto 16px; border-radius:50%; transform:rotate(-8deg);
+    background:radial-gradient(circle at 35% 32%, #ffcf4d, #e8a51c 70%); border:3px solid #8a6d2f;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Marker', cursive; font-size:40px; color:#33230a; box-shadow:5px 6px 0 rgba(0,0,0,.5); }
+  .reveal h2 { font-family:'Marker', cursive; font-weight:400; font-size:clamp(24px,4vw,36px); color:#f7f1de; transform:rotate(-.4deg); }
+  .reveal h2 span { color:#ffb52e; }
+  .reveal p { color:#cfc7ae; margin:14px auto 0; font-size:18.5px; line-height:1.6; max-width:660px; }
+
+  /* ── footer ── */
+  footer { margin-top:50px; padding:16px 22px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+    font-size:15.5px; letter-spacing:1.2px; color:#d8c9a3;
+    background:linear-gradient(180deg,#3a2a16 0%,#2e2010 100%);
+    border:3px solid #1c1206; border-radius:5px 15px 4px 14px/14px 4px 15px 5px;
+    box-shadow:7px 7px 0 rgba(0,0,0,.55); transform:rotate(.25deg); }
+  footer a { color:#3ecf6f; text-decoration:none; font-weight:700; }
+  footer a:hover { text-decoration:underline; }
+
+  @media (max-width:680px){
+    .hero { padding-top:30px; gap:30px; }
+    .badge { right:-6px; width:100px; height:100px; font-size:12.5px; }
+    .board { padding:24px 20px 22px; }
+    .supply .num { font-size:44px; }
+    footer { justify-content:center; text-align:center; }
+  }
 </style>
 </head>
 <body>
+<div class="wrap">
+
   <div class="topbar">
     <div class="logo">DOTGENT<span>.</span>NFT</div>
     <div class="tags">ROBINHOOD CHAIN &nbsp;•&nbsp; ERC-721 &nbsp;•&nbsp; OPENSEA</div>
   </div>
 
+  <div class="rope"></div>
+
   <div class="hero">
     <div class="hero-text">
-      <div class="kicker">SEALED UNTIL REVEAL</div>
+      <span class="sticker">SEALED UNTIL REVEAL</span>
       <h1>THE HOODED<br>AGENTS <span class="gold">OF<br>SHERWOOD</span></h1>
-      <p class="sub">3,000 hooded archers on Robinhood Chain. Every mint is sealed — nobody knows which agent they hold until the reveal. One wallet walks away with the <b style="color:#e8b23a">1/1 Hooded King</b>.</p>
+      <p class="sub">3,000 hooded archers on Robinhood Chain. Every mint is sealed — nobody knows which agent they hold until the reveal. One wallet walks away with the <b>1/1 Hooded King</b>.</p>
+      <p class="scribble"><span class="arr">→</span> that's him. no, you can't see his face. that's the point.</p>
     </div>
     <div class="hero-img">
-      <img src="/nft/sealed.webp" alt="Sealed Dotgent">
-      <div class="sealed-note">▲ WHAT EVERY MINT LOOKS LIKE — UNTIL REVEAL</div>
+      <div class="photo">
+        <img src="/nft/sealed.webp" alt="Sealed Dotgent">
+        <div class="sealed-note">▲ WHAT EVERY MINT LOOKS LIKE — UNTIL REVEAL</div>
+      </div>
+      <div class="badge">ONE 1/1<br>HOODED<br>KING</div>
     </div>
   </div>
 
-  <div class="mintbox">
-    <div class="mint-inner">
+  <div class="board">
+    <h2>THE MINT <span>BOARD</span></h2>
+    <div class="board-row">
       <div class="supply">
         <div class="num">0 <small>/ 3,000</small></div>
-        <div class="bar"><i></i></div>
-        <div class="lbl">MINTED</div>
-      </div>
+        <div class="inkbar"><i></i></div>
+        <div class="lbl">MINTED SO FAR</div>
       </div>
       <div class="mintbtn">
-        <a href="https://opensea.io/collections/chain/robinhood" target="_blank" rel="noopener" style="display:block; width:100%; padding:18px; font-size:17px; font-weight:900; letter-spacing:1px; border-radius:14px; background:#39d98a; color:#04140a; text-decoration:none;">VIEW ON OPENSEA</a>
+        <a class="osbtn" href="https://opensea.io/collections/chain/robinhood" target="_blank" rel="noopener">VIEW ON OPENSEA</a>
         <p>SEALED PIECES TRADE FROM THE FIRST MINT</p>
       </div>
     </div>
   </div>
 
   <div class="reveal">
-    <div class="box">
-      <h2>NOTHING IS SHOWN. EVERYTHING IS SEALED.</h2>
-      <p>No trait previews. No rarity charts. No pictures of what is inside — not even the Hooded King. Every agent stays sealed until the mint closes and the whole collection opens at once on OpenSea.</p>
-    </div>
+    <div class="qseal">?</div>
+    <h2>NOTHING IS SHOWN. <span>EVERYTHING IS SEALED.</span></h2>
+    <p>No trait previews. No rarity charts. No pictures of what is inside — not even the Hooded King. Every agent stays sealed until the mint closes and the whole collection opens at once on OpenSea.</p>
   </div>
 
   <footer>
     <div>DOTGENT NFT — ROBINHOOD CHAIN (4663)</div>
-    <div><a href="https://x.com/dotgent_" target="_blank" rel="noopener" style="color:#39d98a; text-decoration:none; font-weight:700;">X — @dotgent_</a> · CONTRACT: TBA · COLLECTION: OPENSEA (AUTO-INDEXED)</div>
+    <div><a href="https://x.com/dotgent_" target="_blank" rel="noopener">X — @dotgent_</a> · CONTRACT: TBA · COLLECTION: OPENSEA (AUTO-INDEXED)</div>
   </footer>
+
+</div>
 </body>
 </html>
