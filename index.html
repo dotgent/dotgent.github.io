@@ -58,6 +58,9 @@
   .reveal p { color:#b9c4bc; margin-top:10px; font-size:15px; line-height:1.6; max-width:640px; margin-left:auto; margin-right:auto; }
   footer { border-top:1px solid #1e2a24; padding:22px 28px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12px; letter-spacing:1px; color:#8fae9d; }
   @media (max-width:640px){ h1{font-size:44px;} .hero{padding-top:36px;} }
+body::after { content:""; position:fixed; right:-70px; bottom:-30px; width:min(92vw,620px); height:min(92vw,620px); background:url(bg-silhouette.webp) no-repeat center/contain; opacity:.13; mix-blend-mode:screen; pointer-events:none; z-index:0; animation:drift 16s ease-in-out infinite alternate; }
+@keyframes drift { from { transform:translateY(0) } to { transform:translateY(-16px) } }
+.topbar, .hero, .mint, .reveal, footer { position:relative; z-index:1; }
 </style>
 </head>
 <body>
