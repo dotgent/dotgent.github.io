@@ -3,792 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOTGENT — the little dot agent of Robinhood Chain</title>
-<meta name="description" content="Dotgent (DGTG) — a fair-launch memecoin on Robinhood Chain via Pons. Buy right here with your wallet, or join the launch giveaway.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<title>DOTGENT NFT — The Hooded Agents</title>
 <style>
-  :root{
-    --bg:#0E0E13;
-    --bg2:#13131A;
-    --cream:#F6EFE3;
-    --ink:#17130C;
-    --orange:#FF7A1A;
-    --orange-deep:#E85D04;
-    --sun:#FFC53D;
-    --teal:#2EC4B6;
-    --mut:#9A917F;
-    --sand:#C9B590;
-    --brown:#5C4B36;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:"Space Grotesk","Trebuchet MS","Segoe UI",Verdana,sans-serif;
-    background:var(--bg);color:var(--cream);
-    overflow-x:hidden;
-  }
-  /* ---------- nav ---------- */
-  nav{
-    position:sticky;top:0;z-index:50;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:13px 20px;
-    background:rgba(14,14,19,.88);backdrop-filter:blur(8px);
-    border-bottom:1px solid #26262F;
-  }
-  .brand{display:flex;align-items:center;gap:10px;font-family:"Archivo Black",sans-serif;font-size:19px;letter-spacing:.04em}
-  .brand img{width:34px;height:34px;border-radius:50%;border:2px solid var(--orange);background:#FFE9C9}
-  .brand .dot{color:var(--orange)}
-  .nav-x{
-    font-weight:700;font-size:13.5px;color:var(--cream);text-decoration:none;
-    border:1.5px solid #3A3A46;border-radius:999px;padding:7px 15px;
-    font-family:"Space Mono",monospace;
-  }
-  .nav-x:hover{border-color:var(--orange);color:var(--orange)}
-  /* ---------- hero ---------- */
-  .hero{
-    position:relative;overflow:hidden;text-align:center;
-    padding:64px 18px 54px;
-    background:radial-gradient(ellipse 90% 55% at 50% -10%, #2A1A08 0%, var(--bg) 62%);
-  }
-  #dotfield{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-  .hero-inner{position:relative;z-index:1;max-width:860px;margin:0 auto}
-  .kicker{
-    display:inline-block;font-family:"Space Mono",monospace;
-    font-size:11.5px;letter-spacing:.3em;color:var(--sun);
-    border:1px solid #4A3A1C;border-radius:999px;padding:7px 16px;
-    background:rgba(255,197,61,.06);
-  }
-  .hero h1{
-    font-family:"Archivo Black","Arial Black",sans-serif;
-    font-size:clamp(46px,10.5vw,104px);line-height:.96;
-    text-transform:uppercase;margin:26px 0 18px;letter-spacing:.005em;
-  }
-  .hero h1 .o{color:var(--orange)}
-  .hero .sub{font-size:clamp(15.5px,2.3vw,18.5px);line-height:1.6;font-weight:500;color:#D9CFBB;max-width:520px;margin:0 auto}
-  .hero .meta{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:22px}
-  .hero .meta span{
-    font-family:"Space Mono",monospace;font-size:12px;font-weight:700;letter-spacing:.08em;
-    border:1.5px solid #3A3A46;border-radius:999px;padding:6px 13px;color:#CFC5AE;
-  }
-  .hero .meta span.hot{background:var(--orange);border-color:var(--orange);color:var(--ink)}
-  .mascot-wrap{position:relative;width:min(272px,64vw);margin:38px auto 0}
-  .mascot-wrap .ring{
-    border-radius:50%;overflow:hidden;border:4px solid var(--cream);
-    box-shadow:0 0 0 10px rgba(255,122,26,.14), 0 0 70px rgba(255,122,26,.35);
-    animation:breathe 3.6s ease-in-out infinite;background:#FFE9C9;
-  }
-  @keyframes breathe{0%,100%{transform:scale(1) translateY(0)}50%{transform:scale(1.035) translateY(-7px)}}
-  .mascot-wrap img{width:100%;display:block}
-  .mascot-wrap .tag{
-    position:absolute;right:-16px;bottom:20px;transform:rotate(6deg);
-    background:var(--sun);color:var(--ink);font-family:"Space Mono",monospace;
-    font-weight:700;font-size:12px;letter-spacing:.1em;padding:6px 12px;border-radius:6px;
-    border:2px solid var(--ink);box-shadow:3px 3px 0 rgba(0,0,0,.5);
-  }
-  /* ---------- marquee ---------- */
-  .marquee{
-    overflow:hidden;background:var(--orange);color:var(--ink);
-    border-block:3px solid var(--ink);transform:rotate(-1.1deg) scale(1.03);
-    margin:6px 0 4px;position:relative;z-index:2;
-  }
-  .marquee .track{
-    display:flex;width:max-content;white-space:nowrap;
-    font-family:"Archivo Black",sans-serif;font-size:15px;letter-spacing:.12em;
-    padding:11px 0;animation:mq 26s linear infinite;
-  }
-  .marquee .track span{padding-right:14px}
-  @keyframes mq{to{transform:translateX(-50%)}}
-  /* ---------- layout ---------- */
-  main{max-width:700px;margin:0 auto;padding:40px 18px 8px}
-  .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:16px}
-  .sec-head .no{font-family:"Space Mono",monospace;color:var(--orange);font-weight:700;font-size:14px}
-  .sec-head h2{font-family:"Archivo Black",sans-serif;font-size:clamp(26px,5.4vw,36px);text-transform:uppercase;letter-spacing:.01em}
-  .sec-head .tag{
-    margin-left:auto;font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;
-    background:var(--teal);color:var(--ink);padding:5px 11px;border-radius:999px;font-weight:700;white-space:nowrap;
-  }
-  /* ---------- buy card (price tag) ---------- */
-  .buy-card{
-    background:var(--cream);color:var(--ink);border-radius:20px;
-    padding:26px 24px 24px;box-shadow:10px 12px 0 rgba(255,122,26,.9);
-    position:relative;
-  }
-  .buy-card:before{
-    content:"";position:absolute;top:16px;right:20px;width:17px;height:17px;border-radius:50%;
-    background:var(--bg);box-shadow:inset 0 0 0 3px var(--sand);
-  }
-  .buy-card p{font-size:15.5px;line-height:1.55;font-weight:600;max-width:480px}
-  .buy-box{margin-top:18px;border:2.5px dashed var(--sand);border-radius:16px;padding:16px;background:#FFFDF7}
-  .buy-row{display:flex;gap:10px;flex-wrap:wrap}
-  .buy-row input{
-    flex:1 1 130px;font-family:"Space Mono",monospace;font-size:17px;font-weight:700;
-    padding:13px 16px;border-radius:12px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
-  }
-  .buy-row .unit{display:flex;align-items:center;font-weight:900;font-size:15px;padding:0 4px}
-  .btn{
-    font-family:inherit;font-weight:900;cursor:pointer;text-decoration:none;
-    border:3px solid var(--ink);border-radius:999px;
-    box-shadow:4px 4px 0 var(--ink);transition:transform .12s, box-shadow .12s;
-    display:inline-block;text-align:center;
-  }
-  .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--ink)}
-  .btn-buy{width:100%;margin-top:12px;padding:15px;font-size:17px;background:var(--orange);color:#fff;letter-spacing:.03em}
-  .btn-connect{width:100%;margin-top:12px;padding:14px;font-size:16px;background:var(--ink);color:#fff}
-  .btn-buy:disabled{opacity:.45;cursor:not-allowed;box-shadow:2px 2px 0 var(--ink)}
-  .buy-or{text-align:center;margin-top:12px;font-size:12.5px;font-weight:700;color:#8A7658}
-  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .chipbtn{
-    font-family:"Space Mono",monospace;font-weight:700;font-size:13.5px;cursor:pointer;
-    border:2.5px solid var(--ink);border-radius:999px;padding:6px 13px;background:var(--cream);color:var(--ink);
-  }
-  .chipbtn:active{background:var(--sun)}
-  .quote{margin-top:12px;font-weight:900;font-size:16.5px;min-height:22px}
-  .quote small{display:block;font-weight:600;font-size:12.5px;color:#8A7658;margin-top:2px}
-  .buy-note{margin-top:10px;font-size:13px;font-weight:600;color:#8A7658}
-  /* ---------- giveaway ticket ---------- */
-  .ticket{
-    background:var(--cream);color:var(--ink);border-radius:20px;
-    box-shadow:10px 12px 0 rgba(46,196,182,.85);
-    padding:26px 24px 8px;position:relative;
-  }
-  .ticket .intro{font-size:15.5px;line-height:1.55;font-weight:600;max-width:500px}
-  .rail{margin-top:20px;position:relative}
-  .rail:before{
-    content:"";position:absolute;left:19px;top:12px;bottom:12px;width:3px;
-    background:repeating-linear-gradient(var(--sand) 0 7px,transparent 7px 14px);
-  }
-  .task{
-    position:relative;display:flex;gap:14px;align-items:flex-start;
-    padding:10px 0;text-decoration:none;color:inherit;
-  }
-  .task .num{
-    flex:0 0 auto;width:40px;height:40px;border-radius:50%;z-index:1;
-    background:#fff;border:3px solid var(--ink);color:var(--ink);
-    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;
-    font-family:"Space Mono",monospace;
-    transition:background .15s,border-color .15s;
-  }
-  a.task:hover .num{border-color:var(--orange-deep)}
-  a.task.done .num{background:#0B7A55;border-color:#0B7A55;color:#fff}
-  .task .txt{flex:1;min-width:0}
-  .task .txt strong{display:block;font-size:16.5px;color:var(--ink);padding-top:2px}
-  .task .txt span{font-size:13.5px;line-height:1.45;color:var(--brown);font-weight:600}
-  .task .open{
-    margin-left:auto;flex:0 0 auto;font-size:12px;font-weight:900;letter-spacing:.12em;
-    color:var(--orange-deep);padding-top:6px;font-family:"Space Mono",monospace;
-  }
-  a.task.done .open{color:#0B7A55}
-  .task .txt .tpl-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
-  .tpl-actions a{
-    font-family:inherit;font-weight:900;font-size:13.5px;cursor:pointer;text-decoration:none;
-    padding:10px 17px;border-radius:999px;border:2.5px solid var(--ink);
-    background:var(--orange);color:#fff;box-shadow:3px 3px 0 var(--ink);
-  }
-  .task .txt .verify-inline{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-  .verify-inline input{
-    flex:1 1 200px;font-family:inherit;font-size:15px;font-weight:700;
-    padding:13px 15px;border-radius:999px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
-  }
-  .verify-inline button{
-    font-family:inherit;font-weight:900;font-size:15px;cursor:pointer;
-    padding:13px 20px;border-radius:999px;border:3px solid var(--ink);
-    background:var(--orange);color:#fff;box-shadow:3px 3px 0 var(--ink);
-  }
-  .task .txt .wallet-msg{display:block;color:var(--brown)}
-  .task .txt .wallet-msg.ok{color:#0B7A55}
-  .task .txt .wallet-msg.err{color:#C62F0E}
-  /* tear-off stub */
-  .stub-sep{position:relative;border-top:3px dashed var(--sand);margin:20px -24px 0}
-  .stub-sep:before,.stub-sep:after{
-    content:"";position:absolute;top:-13px;width:26px;height:26px;border-radius:50%;background:var(--bg);
-  }
-  .stub-sep:before{left:-38px}
-  .stub-sep:after{right:-38px}
-  .wallet-form{padding:20px 0 22px}
-  .wallet-form strong{font-size:16px;font-weight:900;letter-spacing:.02em}
-  .wallet-form p{color:var(--brown);font-size:13.5px;margin-top:4px;font-weight:600}
-  .wallet-form form{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-  .wallet-form input{
-    flex:1 1 200px;font-family:inherit;font-size:15px;font-weight:700;
-    padding:13px 15px;border-radius:999px;border:3px solid var(--ink);outline:none;min-width:0;background:#fff;color:var(--ink);
-  }
-  .wallet-form button{
-    font-family:inherit;font-weight:900;font-size:15px;cursor:pointer;
-    padding:13px 20px;border-radius:999px;border:3px solid var(--ink);
-    background:var(--orange);color:#fff;box-shadow:3px 3px 0 var(--ink);
-  }
-  .wallet-msg{margin-top:10px;font-weight:800;font-size:14px;min-height:18px}
-  .wallet-msg.ok{color:#0B7A55}
-  .wallet-msg.err{color:#C62F0E}
-  .wallet-form.locked{opacity:.5}
-  .wallet-form.locked input,.wallet-form.locked button{cursor:not-allowed}
-  #lockTag{font-size:12px;letter-spacing:.1em;color:#C62F0E;font-family:"Space Mono",monospace}
-  #lockTag.open{color:#0B7A55}
-  section{margin-bottom:46px}
-  /* ---------- CA ---------- */
-  .ca-band{text-align:center;padding:38px 18px 10px}
-  .ca-band small{display:block;font-family:"Space Mono",monospace;font-weight:700;letter-spacing:.3em;font-size:11px;color:var(--sun);margin-bottom:12px}
-  .ca-band .ca{font-family:"Space Mono",monospace;font-size:clamp(13.5px,3.4vw,19px);font-weight:700;word-break:break-all;color:var(--cream)}
-  footer{
-    text-align:center;padding:22px 18px 38px;font-weight:600;color:var(--mut);font-size:14.5px;line-height:1.7;
-  }
-  footer a{color:var(--orange);text-decoration:none;font-weight:900}
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#07090a; color:#e8e6df; font-family:'Segoe UI', Arial, sans-serif; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; padding:18px 28px; border-bottom:1px solid #1e2a24; }
+  .logo { font-weight:900; font-size:22px; letter-spacing:2px; color:#f5f2e9; }
+  .logo span { color:#e8862e; }
+  .topbar .tags { font-size:12px; letter-spacing:2px; color:#8fae9d; }
+  .hero { display:flex; gap:40px; padding:56px 28px 40px; max-width:1200px; margin:0 auto; align-items:center; flex-wrap:wrap; }
+  .hero-text { flex:1 1 420px; }
+  .kicker { color:#39d98a; letter-spacing:4px; font-size:13px; font-weight:700; margin-bottom:14px; }
+  h1 { font-size:64px; line-height:.95; font-weight:900; letter-spacing:1px; }
+  h1 .gold { color:#e8b23a; }
+  .sub { margin-top:18px; font-size:17px; line-height:1.55; color:#b9c4bc; max-width:480px; }
+  .hero-img { flex:0 1 400px; }
+  .hero-img img { width:100%; border-radius:18px; border:1px solid #2c3a32; box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .sealed-note { text-align:center; font-size:12px; letter-spacing:2px; color:#8fae9d; margin-top:10px; }
+  .mintbox { max-width:1200px; margin:10px auto 0; padding:0 28px; }
+  .mint-inner { background:#0d120e; border:1px solid #223028; border-radius:20px; padding:28px; display:flex; gap:28px; flex-wrap:wrap; align-items:center; }
+  .supply { flex:1 1 260px; }
+  .supply .num { font-size:44px; font-weight:900; }
+  .supply .num small { font-size:20px; color:#8fae9d; }
+  .bar { height:10px; background:#1a241e; border-radius:99px; margin-top:12px; overflow:hidden; }
+  .bar i { display:block; height:100%; width:0%; background:linear-gradient(90deg,#39d98a,#e8b23a); }
+  .supply .lbl { font-size:12px; letter-spacing:2px; color:#8fae9d; margin-top:8px; }
+  .phases { flex:2 1 420px; display:flex; gap:12px; flex-wrap:wrap; }
+  .phase { flex:1 1 120px; border:1px solid #2c3a32; border-radius:14px; padding:14px; background:#0a0e0b; }
+  .phase b { display:block; font-size:15px; letter-spacing:1px; }
+  .phase span { font-size:12px; color:#8fae9d; line-height:1.4; display:block; margin-top:4px; }
+  .phase .price { color:#39d98a; font-weight:800; font-size:14px; margin-top:8px; }
+  .phase.active { border-color:#e8862e; }
+  .mintbtn { flex:0 1 220px; text-align:center; }
+  .mintbtn button { width:100%; padding:18px; font-size:17px; font-weight:900; letter-spacing:1px; border:none; border-radius:14px; background:#39413c; color:#9aa79e; cursor:not-allowed; }
+  .mintbtn p { font-size:12px; color:#8fae9d; margin-top:10px; letter-spacing:1px; }
+  .section { max-width:1200px; margin:0 auto; padding:56px 28px 8px; }
+  .section h2 { font-size:30px; font-weight:900; letter-spacing:1px; }
+  .section h2 span { color:#e8862e; }
+  .section p.lead { color:#b9c4bc; margin-top:8px; font-size:15px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:18px; margin-top:24px; }
+  .card { background:#0d120e; border:1px solid #223028; border-radius:16px; overflow:hidden; }
+  .card img { width:100%; display:block; }
+  .card .meta { padding:14px 16px; }
+  .card .tier { font-size:11px; letter-spacing:3px; font-weight:800; }
+  .card .desc { font-size:13px; color:#b9c4bc; margin-top:6px; line-height:1.5; }
+  .t-common { color:#8fae9d; } .t-rare { color:#39c2d9; } .t-legend { color:#e8b23a; } .t-one { color:#ff7847; }
+  .wide { display:flex; flex-wrap:wrap; margin-top:18px; background:linear-gradient(120deg,#141005,#0d120e); border:1px solid #4a3a14; border-radius:16px; overflow:hidden; }
+  .wide img { width:300px; max-width:100%; display:block; }
+  .wide .meta { padding:24px; flex:1 1 300px; }
+  .wide .meta h3 { font-size:24px; font-weight:900; }
+  .reveal { max-width:1200px; margin:0 auto; padding:48px 28px 60px; text-align:center; }
+  .reveal .box { border:1px dashed #2c3a32; border-radius:20px; padding:36px 24px; }
+  .reveal h2 { font-size:28px; font-weight:900; }
+  .reveal p { color:#b9c4bc; margin-top:10px; font-size:15px; line-height:1.6; max-width:640px; margin-left:auto; margin-right:auto; }
+  footer { border-top:1px solid #1e2a24; padding:22px 28px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; font-size:12px; letter-spacing:1px; color:#8fae9d; }
+  @media (max-width:640px){ h1{font-size:44px;} .hero{padding-top:36px;} }
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="brand"><img src="mascot.webp" alt="Dotgent mascot">DOTGENT<span class="dot">.</span></div>
-  <div class="nav-links">
-    <a class="nav-x" href="https://x.com/dotgent_" target="_blank" rel="noopener">@dotgent_</a>
+  <div class="topbar">
+    <div class="logo">DOTGENT<span>.</span>NFT</div>
+    <div class="tags">ROBINHOOD CHAIN &nbsp;•&nbsp; ERC-721 &nbsp;•&nbsp; OPENSEA</div>
   </div>
-</nav>
 
-<header class="hero">
-  <canvas id="dotfield"></canvas>
-  <div class="hero-inner">
-    <span class="kicker">ROBINHOOD CHAIN · FAIR LAUNCH ON PONS</span>
-    <h1>ONE LITTLE<br>DOT<span class="o">.</span><br>BIG CHAIN ENERGY<span class="o">.</span></h1>
-    <p class="sub">Dotgent is the round little agent living on Robinhood Chain. No presale, no waiting room — it launched fair on Pons, and trading is live right now.</p>
-    <div class="meta">
-      <span class="hot">$DGTG</span><span>CHAIN: ROBINHOOD</span><span>LAUNCHPAD: PONS</span><span>PRESALE: NONE</span>
+  <div class="hero">
+    <div class="hero-text">
+      <div class="kicker">SEALED UNTIL REVEAL</div>
+      <h1>THE HOODED<br>AGENTS <span class="gold">OF<br>SHERWOOD</span></h1>
+      <p class="sub">3,000 hooded archers on Robinhood Chain. Every mint is sealed — nobody knows which agent they hold until the reveal. One wallet walks away with the <b style="color:#e8b23a">1/1 Hooded King</b>.</p>
     </div>
-    <div class="mascot-wrap">
-      <div class="ring"><img src="mascot.webp" alt="Dotgent — the round dot agent"></div>
-      <span class="tag">EST. BLOCK 1</span>
+    <div class="hero-img">
+      <img src="/nft/sealed.webp" alt="Sealed Dotgent">
+      <div class="sealed-note">▲ WHAT EVERY MINT LOOKS LIKE — UNTIL REVEAL</div>
     </div>
   </div>
-</header>
 
-<div class="marquee" aria-hidden="true">
-  <div class="track">
-    <span>$DGTG ✦ ROBINHOOD CHAIN ✦ FAIR LAUNCH ✦ NO PRESALE ✦ LIVE ON PONS ✦ ONE DOT ✦&nbsp;</span>
-    <span>$DGTG ✦ ROBINHOOD CHAIN ✦ FAIR LAUNCH ✦ NO PRESALE ✦ LIVE ON PONS ✦ ONE DOT ✦&nbsp;</span>
+  <div class="mintbox">
+    <div class="mint-inner">
+      <div class="supply">
+        <div class="num">0 <small>/ 3,000</small></div>
+        <div class="bar"><i></i></div>
+        <div class="lbl">MINTED</div>
+      </div>
+      <div class="phases">
+        <div class="phase active"><b>1 · GTD</b><span>Guaranteed whitelist. Your slot waits for you — no rush, no gas war.</span><div class="price">FREE</div></div>
+        <div class="phase"><b>2 · FCFS</b><span>Whitelist, first come first served until the phase allocation is gone.</span><div class="price">FREE</div></div>
+        <div class="phase"><b>3 · PUBLIC</b><span>Open to everyone. Per-wallet limit. Until sold out.</span><div class="price">0.001 ETH</div></div>
+      </div>
+      <div class="mintbtn">
+        <a href="/snapshot/" style="display:block; width:100%; padding:18px; font-size:17px; font-weight:900; letter-spacing:1px; border-radius:14px; background:#39d98a; color:#04140a; text-decoration:none;">JOIN THE SNAPSHOT</a>
+        <p>GTD / FCFS ALLOWLIST — FREE TO JOIN</p>
+      </div>
+    </div>
   </div>
-</div>
 
-<main>
-  <!-- BUY -->
-  <section id="buy">
-    <div class="sec-head"><span class="no">01</span><h2>Buy $DGTG</h2><span class="tag">ON PONS</span></div>
-    <div class="buy-card">
-      <p>Trading is live on the Pons launchpad. Pick how much ETH, connect your wallet, buy — the tokens land straight in your wallet.</p>
-      <div class="buy-box">
-        <div class="buy-row">
-          <input type="text" inputmode="decimal" placeholder="0.0005" id="buyAmount" value="0.0005" autocomplete="off">
-          <span class="unit">ETH</span>
-        </div>
-        <div class="chips">
-          <button type="button" class="chipbtn" data-amt="0.0001">0.0001</button>
-          <button type="button" class="chipbtn" data-amt="0.0003">0.0003</button>
-          <button type="button" class="chipbtn" data-amt="0.0005">0.0005</button>
-          <button type="button" class="chipbtn" data-amt="0.0008">0.0008</button>
-        </div>
-        <button class="btn btn-connect" id="connectBtn" type="button">CONNECT WALLET</button>
-        <button class="btn btn-buy" id="buyBtn" type="button">BUY $DGTG</button>
-        <div class="buy-or">— or —</div>
-        <a class="btn btn-buy" href="https://ponsfamily.com/launchpad/0x8193aD27443Fde06589987d8c668C0AD92185F4A" target="_blank" rel="noopener" style="display:block;text-decoration:none">BUY $DGTG ON PONS</a>
-        <div class="buy-note" id="buyNote">Trading is LIVE on the Pons curve — tap the button and buy on the launchpad, straight from your wallet.</div>
-      </div>
+  <div class="reveal">
+    <div class="box">
+      <h2>NOTHING IS SHOWN. EVERYTHING IS SEALED.</h2>
+      <p>No trait previews. No rarity charts. No pictures of what is inside — not even the Hooded King. Every agent stays sealed until the mint closes and the whole collection opens at once on OpenSea.</p>
     </div>
-  </section>
+  </div>
 
-  <!-- GIVEAWAY -->
-  <section id="giveaway">
-    <div class="sec-head"><span class="no">02</span><h2>Launch Giveaway</h2><span class="tag">FREE $DGTG</span></div>
-    <div class="ticket">
-      <p class="intro">Follow, like, repost, post the template — then verify your post and drop your wallet. Winners are picked from all verified entries after launch.</p>
-      <div class="rail">
-        <a class="task" href="https://x.com/intent/follow?screen_name=dotgent_" target="_blank" rel="noopener">
-          <span class="num">1</span>
-          <span class="txt"><strong>Follow @dotgent_</strong><span>Opens our X page — hit Follow there.</span></span>
-          <span class="open">OPEN →</span>
-        </a>
-        <a class="task" href="https://x.com/intent/like?tweet_id=2125983869853995405" target="_blank" rel="noopener">
-          <span class="num">2</span>
-          <span class="txt"><strong>Like the launch post</strong><span>Opens the post — drop a like on it.</span></span>
-          <span class="open">OPEN →</span>
-        </a>
-        <a class="task" href="https://x.com/intent/retweet?tweet_id=2125983869853995405" target="_blank" rel="noopener">
-          <span class="num">3</span>
-          <span class="txt"><strong>Repost it</strong><span>Same post — hit Repost so the dot travels.</span></span>
-          <span class="open">OPEN →</span>
-        </a>
-        <div class="task">
-          <span class="num" id="tplNum">4</span>
-          <span class="txt">
-            <span class="tpl-actions">
-              <a id="postTplBtn" href="#" target="_blank" rel="noopener">POST IT ON X →</a>
-            </span>
-            <form id="proofForm" class="verify-inline">
-              <input type="text" id="proofInput" placeholder="https://x.com/you/status/…" autocomplete="off" spellcheck="false">
-              <button type="submit" id="proofBtn">VERIFY</button>
-            </form>
-            <span class="wallet-msg" id="proofMsg"></span>
-          </span>
-        </div>
-        <div class="task">
-          <span class="num">5</span>
-          <span class="txt"><strong>Drop your EVM wallet</strong><span>Stays locked until your post verifies. That's your ticket.</span></span>
-        </div>
-      </div>
-      <div class="stub-sep"></div>
-      <div class="wallet-form locked" id="walletBox">
-        <strong>YOUR EVM WALLET <span id="lockTag">🔒 LOCKED</span></strong>
-        <p>One entry per wallet. This is where your prize goes if you win.</p>
-        <form id="walletForm">
-          <input type="text" id="walletInput" placeholder="0x… your EVM wallet address" autocomplete="off" spellcheck="false" disabled>
-          <button type="submit" id="walletBtn" disabled>ENTER</button>
-        </form>
-        <div class="wallet-msg" id="walletMsg"></div>
-      </div>
-    </div>
-  </section>
-</main>
-
-<div class="ca-band">
-  <small>CONTRACT ADDRESS</small>
-  <div class="ca">0x8193aD27443Fde06589987d8c668C0AD92185F4A</div>
-</div>
-
-<footer>
-  dotgent.xyz — home of the dot.<br>
-  Follow the launch on X: <a href="https://x.com/dotgent_" target="_blank" rel="noopener">@dotgent_</a>
-</footer>
-
-<script>
-// giveaway tasks: mark done when tapped
-  document.querySelectorAll('a.task').forEach(function (a) {
-    a.addEventListener('click', function () {
-      a.classList.add('done');
-      var n = a.querySelector('.num');
-      if (n) n.textContent = '✓';
-      var o = a.querySelector('.open');
-      if (o) o.textContent = 'DONE ✓';
-    });
-  });
-
-  // ---------- giveaway: template post + verified-post gate ----------
-  var tplText = 'I just joined the $DGTG giveaway 🚀\n' +
-    'Dotgent is LIVE on Pons — Robinhood Chain!\n' +
-    'Join here 👉 dotgent.xyz\n' +
-    'CA: 0x8193aD27443Fde06589987d8c668C0AD92185F4A\n' +
-    '#DGTG #RobinhoodChain';
-  document.getElementById('postTplBtn').href =
-    'https://x.com/intent/post?text=' + encodeURIComponent(tplText);
-  function markDone(id) {
-    var n = document.getElementById(id);
-    if (n) { n.textContent = '✓'; n.style.background = '#0B7A55'; n.style.borderColor = '#0B7A55'; }
-  }
-  document.getElementById('postTplBtn').addEventListener('click', function () { markDone('tplNum'); });
-
-  // verify gate: the server reads the visitor's post and checks the template
-  // is really in it — the wallet field unlocks only on a verified post.
-  var verifiedPost = '';
-  function reasonText(r) {
-    if (r === 'incomplete') return 'That post doesn\'t carry the full template — it needs $DGTG and the contract address, word for word from step 3.';
-    if (r === 'not_found') return 'Couldn\'t find that post — check the link and try again.';
-    if (r === 'bad_link') return 'That\'s not an X post link — it looks like https://x.com/you/status/123456…';
-    return 'Couldn\'t reach X to verify just now — try again in a minute.';
-  }
-  document.getElementById('proofForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var v = document.getElementById('proofInput').value.trim();
-    var msg = document.getElementById('proofMsg');
-    var btn = document.getElementById('proofBtn');
-    if (!/^https:\/\/(x\.com|twitter\.com)\/[^\/\s]+\/status\/\d+/.test(v)) {
-      msg.className = 'wallet-msg err';
-      msg.textContent = reasonText('bad_link');
-      return;
-    }
-    btn.disabled = true;
-    msg.className = 'wallet-msg';
-    msg.textContent = 'Reading your post…';
-    fetch('https://dotgent-giveaway.reuniakbarpunk212.workers.dev/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ post: v })
-    }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.ok) {
-        verifiedPost = v;
-        msg.className = 'wallet-msg ok';
-        msg.textContent = 'Post verified — the template is in it. Wallet field unlocked below.';
-        var box = document.getElementById('walletBox');
-        box.classList.remove('locked');
-        document.getElementById('walletInput').disabled = false;
-        document.getElementById('walletBtn').disabled = false;
-        var tag = document.getElementById('lockTag');
-        tag.textContent = '🔓 OPEN';
-        tag.className = 'open';
-        document.getElementById('proofInput').disabled = true;
-      } else {
-        msg.className = 'wallet-msg err';
-        msg.textContent = reasonText(d && d.reason);
-        btn.disabled = false;
-      }
-    }).catch(function () {
-      msg.className = 'wallet-msg err';
-      msg.textContent = reasonText('unreachable');
-      btn.disabled = false;
-    });
-  });
-
-  // wallet form: validate, then STORE the entry on the giveaway worker —
-  // success is shown only after the entry is actually saved.
-  document.getElementById('walletForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    var v = document.getElementById('walletInput').value.trim();
-    var msg = document.getElementById('walletMsg');
-    var btn = document.getElementById('walletBtn');
-    if (!/^0x[0-9a-fA-F]{40}$/.test(v)) {
-      msg.className = 'wallet-msg err';
-      msg.textContent = 'That doesn\'t look like an EVM address — it starts with 0x and has 42 characters.';
-      return;
-    }
-    btn.disabled = true;
-    msg.className = 'wallet-msg';
-    msg.textContent = 'Saving your entry…';
-    fetch('https://dotgent-giveaway.reuniakbarpunk212.workers.dev/enter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ wallet: v, post: verifiedPost })
-    }).then(function (r) { return r.json(); }).then(function (d) {
-      if (d && d.ok) {
-        msg.className = 'wallet-msg ok';
-        msg.textContent = d.duplicate
-          ? 'This wallet is already on the giveaway list — entry updated. Good luck, dot.'
-          : 'You\'re in. This wallet is on the giveaway list — good luck, dot.';
-        document.getElementById('walletInput').value = '';
-      } else {
-        msg.className = 'wallet-msg err';
-        msg.textContent = 'That didn\'t save — please try again, and drop your wallet in the X post replies too, just in case.';
-      }
-    }).catch(function () {
-      msg.className = 'wallet-msg err';
-      msg.textContent = 'That didn\'t save — please try again, and drop your wallet in the X post replies too, just in case.';
-    }).finally(function () { btn.disabled = false; });
-  });
-
-  // ---------- on-site buy: Pons curve, straight from the visitor's wallet ----------
-  var RPC = 'https://rpc.mainnet.chain.robinhood.com';
-  var CHAIN_ID_HEX = '0x1237'; // 4663 decimal — computed, not hand-typed
-  var CURVE = '0x0D7F81d0881d11C74C9684F03C6D0c2931547940';
-  var TOKEN = '0x8193aD27443Fde06589987d8c668C0AD92185F4A';
-  var BUY_SEL = '59a87bc1';   // buy(uint256,uint256,address)
-  var BAL_SEL = '70a08231';   // balanceOf(address)
-  var WC_PROJECT_ID = '54c8aa050b7571d06b4adfa8f03b6e39';
-  var provider = null, account = null;
-
-  function $(id) { return document.getElementById(id); }
-  var RPC_PROXY = 'https://dotgent-giveaway.reuniakbarpunk212.workers.dev/rpc';
-  function rpcOnce(url, method, params) {
-    // Hard 10s timeout: in wallet-app browsers a page fetch can hang
-    // forever without rejecting, which silently froze the buy's quote
-    // check. Aborting lets callers fall back to the next source.
-    var ctrl = ('AbortController' in window) ? new AbortController() : null;
-    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, 10000) : null;
-    var opts = {
-      method: 'POST', headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: method, params: params })
-    };
-    if (ctrl) opts.signal = ctrl.signal;
-    return fetch(url, opts).then(function (r) {
-      if (timer) clearTimeout(timer);
-      if (r.status >= 400) throw new Error('http ' + r.status);
-      return r.json();
-    }).catch(function (e) {
-      if (timer) clearTimeout(timer);
-      throw e;
-    });
-  }
-  function rpc(method, params) {
-    // Read path: the worker proxy first — some phones stall on direct
-    // fetches to the chain RPC host, while workers.dev answers anywhere.
-    // The direct RPC stays as fallback.
-    return rpcOnce(RPC_PROXY, method, params).then(function (res) {
-      if (res && res.error && res.error.code === 429) throw new Error('rate limited');
-      return res;
-    }).catch(function () {
-      return rpcOnce(RPC, method, params);
-    });
-  }
-  function pad32(big) {
-    var h = big.toString(16);
-    while (h.length < 64) h = '0' + h;
-    return h;
-  }
-  function padAddr(a) {
-    var h = a.toLowerCase().replace('0x', '');
-    while (h.length < 64) h = '0' + h;
-    return h;
-  }
-  function parseEth(str) {
-    str = (str || '').trim().replace(',', '.');
-    if (!/^\d*(\.\d*)?$/.test(str) || str === '' || str === '.') return null;
-    var parts = str.split('.');
-    var whole = parts[0] === '' ? '0' : parts[0];
-    var frac = ((parts[1] || '') + '000000000000000000').slice(0, 18);
-    var wei = BigInt(whole) * 1000000000000000000n + BigInt(frac);
-    return wei > 0n ? wei : null;
-  }
-  function fmtNum(big) { // 18-dec token amount -> grouped integer string
-    var s = (big / 1000000000000000000n).toString();
-    return s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
-  function encodeBuy(amountWei, minOut, addr) {
-    return '0x' + BUY_SEL + pad32(amountWei) + pad32(minOut) + padAddr(addr);
-  }
-  function ethCall(to, data, fromAddr, valueHex) {
-    var callObj = { to: to, data: data };
-    if (fromAddr) callObj.from = fromAddr;
-    if (valueHex) callObj.value = valueHex;
-    // Direct RPC read first (works in normal browsers, connected or not).
-    // Fall back to the connected wallet only when the direct read fails —
-    // wallet-app browsers can block page fetches, while WalletConnect
-    // wallets may answer eth_call on the wrong network.
-    return rpc('eth_call', [callObj, 'latest'])
-      .then(function (res) { return (res.result && res.result !== '0x') ? res.result : null; })
-      .catch(function () { return null; })
-      .then(function (hex) {
-        if (hex !== null || !(provider && account)) return hex;
-        return provider.request({ method: 'eth_call', params: [callObj, 'latest'] })
-          .then(function (h) { return (h && h !== '0x') ? h : null; })
-          .catch(function () { return null; });
-      });
-  }
-  function tokenBalance(addr) {
-    return ethCall(TOKEN, '0x' + BAL_SEL + padAddr(addr), null, null)
-      .then(function (hex) { return hex ? BigInt(hex) : 0n; });
-  }
-  document.querySelectorAll('.chipbtn').forEach(function (b) {
-    b.addEventListener('click', function () {
-      $('buyAmount').value = b.getAttribute('data-amt');
-    });
-  });
-</script>
-<script>
-  // ---------- buy: open wallet -> connect -> switch network -> buy. Done. ----------
-  var isWC = false;
-  var wcProvider = null;
-  function loadWC() {
-    return new Promise(function (resolve, reject) {
-      if (window['@walletconnect/ethereum-provider']) return resolve();
-      var urls = [
-        'wc-provider.js',
-        'https://unpkg.com/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js',
-        'https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.21.0/dist/index.umd.js'
-      ];
-      var i = 0;
-      function next() {
-        if (i >= urls.length) return reject(new Error('wc load failed'));
-        var s = document.createElement('script');
-        s.src = urls[i++];
-        s.onload = function () { resolve(); };
-        s.onerror = next;
-        document.head.appendChild(s);
-      }
-      next();
-    });
-  }
-  function getWC() {
-    if (wcProvider) return Promise.resolve(wcProvider);
-    return loadWC().then(function () {
-      return window['@walletconnect/ethereum-provider'].EthereumProvider.init({
-        projectId: WC_PROJECT_ID,
-        chains: [4663],
-        rpcMap: { 4663: RPC },
-        disableProviderPing: true,
-        showQrModal: true,
-        metadata: { name: 'Dotgent', description: 'Dotgent (DGTG) on Robinhood Chain', url: 'https://dotgent.xyz', icons: ['https://dotgent.xyz/mascot.webp'] }
-      });
-    }).then(function (wc) { wcProvider = wc; return wc; });
-  }
-  function addChain(p) {
-    return p.request({
-      method: 'wallet_addEthereumChain',
-      params: [{
-        chainId: CHAIN_ID_HEX, chainName: 'Robinhood Chain',
-        nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-        rpcUrls: [RPC], blockExplorerUrls: ['https://robinhoodchain.blockscout.com']
-      }]
-    });
-  }
-  function switchChain(p) {
-    return p.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: CHAIN_ID_HEX }] })
-      .catch(function (err) {
-        if (err && err.code === 4902) return addChain(p);
-        throw err;
-      });
-  }
-  function cidEq(cid) {
-    // The WalletConnect provider answers eth_chainId with the NUMBER
-    // 4663, not the hex string — compare loosely or every chain check
-    // fails while the wallet is in fact on Robinhood Chain. (Proven
-    // with a real WC session + real buy on 2026-11-27.)
-    if (typeof cid === 'number') return cid === 4663;
-    if (typeof cid === 'string') return cid.toLowerCase() === CHAIN_ID_HEX;
-    return false;
-  }
-  function connect() {
-    $('connectBtn').textContent = 'CONNECTING…';
-    $('buyNote').textContent = 'Approve the connection in your wallet.';
-    var getP;
-    if (window.ethereum) {
-      isWC = false;
-      provider = window.ethereum;
-      getP = provider.request({ method: 'eth_requestAccounts' }).then(function (accs) { account = accs[0]; });
-    } else {
-      isWC = true;
-      getP = getWC().then(function (wc) {
-        provider = wc;
-        return wc.connect();
-      }).then(function () {
-        return provider.request({ method: 'eth_accounts' });
-      }).then(function (accs) {
-        account = (accs && accs[0]) || (provider.accounts && provider.accounts[0]);
-        if (!account) throw new Error('no account');
-      });
-    }
-    return getP.then(function () {
-      // Unlock FIRST. The network switch and balance below are only
-      // follow-ups — if any of their reads stalls inside the wallet,
-      // the buttons must already work. (A stalled read here is what
-      // left BUY dead on the owner's phone.)
-      $('connectBtn').textContent = account.slice(0, 6) + '…' + account.slice(-4);
-      $('buyBtn').disabled = false;
-      $('buyNote').textContent = 'Connected.';
-      return provider.request({ method: 'eth_chainId' });
-    }).then(function (cid) {
-      if (!cidEq(cid)) return switchChain(provider); // switch right away, as part of connecting
-    }).then(function () {
-      return provider.request({ method: 'eth_chainId' });
-    }).then(function (cid) {
-      if (cidEq(cid)) return cid;
-      // Some wallets resolve the switch a beat before the new chain is
-      // readable — one short second look before calling it wrong.
-      return new Promise(function (res) { setTimeout(res, 800); }).then(function () {
-        return provider.request({ method: 'eth_chainId' });
-      });
-    }).then(function (cid) {
-      if (!cidEq(cid)) {
-        $('buyNote').textContent = 'Connected, but not on Robinhood Chain — switch the network in your wallet, then tap BUY.';
-        return;
-      }
-      return tokenBalance(account).then(function (bal) {
-        $('buyNote').textContent = 'Connected on Robinhood Chain. Your balance: ' + fmtNum(bal) + ' $DGTG.';
-      }).catch(function () {});
-    }).catch(function () {
-      if (!account) {
-        $('connectBtn').textContent = 'CONNECT WALLET';
-        $('buyNote').textContent = 'Connect was cancelled — try again.';
-      }
-      // With an account set, a follow-up read failed — buttons stay live.
-    });
-  }
-  // Start the WalletConnect provider at page load, not on the click —
-  // its init/relay warm-up is the flaky part; the click should only
-  // have the session left to do.
-  getWC().catch(function () {});
-  $('connectBtn').addEventListener('click', function () {
-    if (account) return;
-    connect();
-  });
-  $('buyBtn').addEventListener('click', function () {
-    if (!account || !provider) { connect(); return; }
-    var wei = parseEth($('buyAmount').value);
-    if (wei === null) { $('buyNote').textContent = 'Type how much ETH you want to spend first.'; return; }
-    $('buyBtn').disabled = true;
-    $('buyBtn').textContent = 'CONFIRM IN WALLET…';
-    var firstRead = Promise.race([
-      provider.request({ method: 'eth_chainId' }),
-      new Promise(function (_, rej) { setTimeout(function () { rej(new Error('chain timeout')); }, 6000); })
-    ]);
-    firstRead.then(function (cid) {
-      if (cidEq(cid)) return cid;
-      return switchChain(provider).then(function () {
-        return provider.request({ method: 'eth_chainId' });
-      });
-    }).then(function (cid) {
-      if (!cidEq(cid)) throw new Error('wrong chain');
-      // No price check anywhere in the buy: the visitor picks an ETH
-      // amount and buys at the curve's live price (minOut 0).
-      return provider.request({
-        method: 'eth_sendTransaction',
-        params: [{ from: account, to: CURVE, value: '0x' + wei.toString(16), data: encodeBuy(wei, 0n, account) }]
-      }).then(function (hash) {
-        $('buyBtn').textContent = 'PENDING…';
-        $('buyNote').textContent = 'Sent! Waiting for the chain to confirm…';
-        var tries = 0;
-        (function poll() {
-          tries++;
-          var viaWallet = provider.request({ method: 'eth_getTransactionReceipt', params: [hash] })
-            .then(function (r) { return { result: r }; })
-            .catch(function () { return rpc('eth_getTransactionReceipt', [hash]); });
-          viaWallet.then(function (res) {
-            if (res.result) {
-              if (res.result.status === '0x1') {
-                $('buyNote').textContent = 'Done — the $DGTG is in your wallet. Welcome to the dots 🟠';
-              } else {
-                $('buyNote').textContent = 'The transaction failed on-chain — no tokens moved. Try a smaller amount.';
-              }
-              $('buyBtn').textContent = 'BUY $DGTG';
-              $('buyBtn').disabled = false;
-            } else if (tries < 40) {
-              setTimeout(poll, 1500);
-            } else {
-              $('buyNote').textContent = 'Still pending — check your wallet activity in a bit.';
-              $('buyBtn').textContent = 'BUY $DGTG';
-              $('buyBtn').disabled = false;
-            }
-          }).catch(function () {
-            if (tries < 40) setTimeout(poll, 1500);
-          });
-        })();
-      });
-    }).catch(function (err) {
-      $('buyNote').textContent = (err && err.message === 'wrong chain')
-        ? 'Your wallet is not on Robinhood Chain — switch the network in your wallet, then tap BUY.'
-        : (err && err.message === 'chain timeout')
-          ? 'Could not reach your wallet — open it, make sure it is on Robinhood Chain, then tap BUY again.'
-          : 'Buy cancelled in the wallet, or it failed — nothing was spent.';
-      $('buyBtn').textContent = 'BUY $DGTG';
-      $('buyBtn').disabled = false;
-    });
-  });
-</script>
-<script>
-  // hero dot field: tiny dots drifting up, twinkling
-  (function () {
-    var c = document.getElementById('dotfield');
-    if (!c) return;
-    var x = c.getContext('2d');
-    var W, H, dots = [];
-    function rs() { W = c.width = c.offsetWidth; H = c.height = c.offsetHeight; }
-    rs(); addEventListener('resize', rs);
-    for (var i = 0; i < 46; i++) dots.push({
-      x: Math.random(), y: Math.random(),
-      r: Math.random() * 2.2 + 0.6,
-      s: Math.random() * 0.00045 + 0.00012,
-      o: Math.random() * 0.5 + 0.15,
-      p: Math.random() * 6.28
-    });
-    (function loop(t) {
-      x.clearRect(0, 0, W, H);
-      for (var i = 0; i < dots.length; i++) {
-        var d = dots[i];
-        d.y -= d.s;
-        if (d.y < -0.02) { d.y = 1.02; d.x = Math.random(); }
-        var tw = 0.55 + 0.45 * Math.sin(t / 900 + d.p);
-        x.beginPath();
-        x.arc(d.x * W, d.y * H, d.r, 0, 6.29);
-        x.fillStyle = 'rgba(255,150,60,' + (d.o * tw).toFixed(3) + ')';
-        x.fill();
-      }
-      requestAnimationFrame(loop);
-    })(0);
-  })();
-</script>
+  <footer>
+    <div>DOTGENT NFT — ROBINHOOD CHAIN (4663)</div>
+    <div>CONTRACT: TBA · COLLECTION: OPENSEA (AUTO-INDEXED)</div>
+  </footer>
 </body>
 </html>
