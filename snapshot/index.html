@@ -62,7 +62,7 @@
       <div class="head-text">
         <div class="kicker">DOTGENT NFT — GET ON THE LIST</div>
         <h1>THE WALLET<br><span class="gold">SNAPSHOT</span></h1>
-        <p class="sub">The Dotgent NFT mint runs in phases — GTD first, then FCFS, then public. Complete the three steps below and drop your wallet to be captured in the snapshot for the GTD / FCFS allowlist.</p>
+        <p class="sub">The Dotgent NFT mint runs in phases — GTD first, then FCFS, then public. Complete the four steps below and drop your wallet to be captured in the snapshot for the GTD / FCFS allowlist.</p>
         <div class="counter"><span class="n" id="countNum">–</span><span class="t">WALLETS IN THE SNAPSHOT</span></div>
       </div>
       <div class="head-img">
@@ -93,6 +93,15 @@
       <div class="step">
         <div class="num">3</div>
         <div class="body">
+          <h2>REPOST THE POST</h2>
+          <p>Repost the announcement post so the snapshot reaches the whole forest.</p>
+        </div>
+        <div class="act"><a class="btn" id="repostBtn" href="#" target="_blank" rel="noopener">OPEN POST</a></div>
+      </div>
+
+      <div class="step">
+        <div class="num">4</div>
+        <div class="body">
           <h2>COMMENT ON THE POST</h2>
           <p>Leave a comment on the same post — tell Sherwood you are coming for a hooded agent.</p>
         </div>
@@ -100,13 +109,14 @@
       </div>
 
       <div class="step gold">
-        <div class="num">4</div>
+        <div class="num">5</div>
         <div class="body" style="flex:1 1 100%;">
           <h2>DROP YOUR WALLET</h2>
-          <p>Confirm the three steps, then submit your X username and your EVM wallet address (Robinhood Chain). One wallet per person — submitting again with the same wallet updates your X handle.</p>
+          <p>Confirm the four steps, then submit your X username and your EVM wallet address (Robinhood Chain). One wallet per person — submitting again with the same wallet updates your X handle.</p>
           <div class="checks">
             <label><input type="checkbox" id="ckFollow"> I followed @dotgent_ on X</label>
             <label><input type="checkbox" id="ckLike"> I liked the post</label>
+            <label><input type="checkbox" id="ckRepost"> I reposted the post</label>
             <label><input type="checkbox" id="ckComment"> I commented on the post</label>
           </div>
           <div class="fields">
@@ -135,15 +145,17 @@
   </footer>
 
 <script>
-  // === CONFIG: the X post that visitors must like + comment on. ===
+  // === CONFIG: the X post that visitors must like + repost + comment on. ===
   const POST_URL = "https://x.com/dotgent_/status/2125952844113350760";
   const API = "https://dotgent-giveaway.reuniakbarpunk212.workers.dev";
 
   document.getElementById("likeBtn").href = POST_URL;
+  document.getElementById("repostBtn").href = POST_URL;
   document.getElementById("commentBtn").href = POST_URL;
 
   const ckFollow = document.getElementById("ckFollow");
   const ckLike = document.getElementById("ckLike");
+  const ckRepost = document.getElementById("ckRepost");
   const ckComment = document.getElementById("ckComment");
   const xInput = document.getElementById("xInput");
   const walletInput = document.getElementById("walletInput");
@@ -153,9 +165,9 @@
   const WALLET_RE = /^0x[0-9a-fA-F]{40}$/;
 
   function refreshSubmit() {
-    submitBtn.disabled = !(ckFollow.checked && ckLike.checked && ckComment.checked);
+    submitBtn.disabled = !(ckFollow.checked && ckLike.checked && ckRepost.checked && ckComment.checked);
   }
-  [ckFollow, ckLike, ckComment].forEach(c => c.addEventListener("change", refreshSubmit));
+  [ckFollow, ckLike, ckRepost, ckComment].forEach(c => c.addEventListener("change", refreshSubmit));
 
   function showMsg(kind, text) {
     msgBox.className = "msg " + kind;
