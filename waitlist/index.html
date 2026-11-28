@@ -200,7 +200,10 @@
       ctaTxt.textContent = "Pass locked: " + myPass.pass;
       ctaBtn.disabled = true;
       xInput.disabled = true; wInput.disabled = true;
-      var text = "I am joining the @dotgent_ whitelist. Pass: " + myPass.pass + " \u{1F3F9}";
+      var text = "I am joining the @dotgent_ whitelist. \u{1F3F9}\n" +
+        "Pass: " + myPass.pass + "\n\n" +
+        "The Hooded Agents \u2014 3,000 NFTs on the Robinhood Chain network. Every archer stays sealed until the reveal, and one 1/1 Hooded King is hiding in the supply.\n\n" +
+        "Claim your number before the gate fills up \u{1F447}";
       document.getElementById("shareLink").href =
         "https://x.com/intent/post?text=" + encodeURIComponent(text) +
         "&url=" + encodeURIComponent("https://dotgent.xyz/waitlist/");
