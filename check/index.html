@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOTGENT — Check Your Spot | The Hooded Agents</title>
+<meta name="description" content="Check if your wallet is on The Hooded Agents whitelist. Paste your EVM address or X username — 3,000 sealed hooded archers on Robinhood Chain.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dotgent">
+<meta property="og:title" content="Dotgent — Check Your Spot">
+<meta property="og:description" content="Are you on the list? Check your whitelist spot for The Hooded Agents.">
+<meta property="og:url" content="https://dotgent.xyz/check/">
+<meta property="og:image" content="https://dotgent.xyz/waitlist/pass-card.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dotgent — Check Your Spot">
+<meta name="twitter:description" content="Are you on the list? Check your whitelist spot for The Hooded Agents.">
+<meta name="twitter:image" content="https://dotgent.xyz/waitlist/pass-card.png">
+<style>
+  @font-face { font-family:'Marker'; src:url('../fonts/PermanentMarker.ttf') format('truetype'); }
+  @font-face { font-family:'Hand'; src:url('../fonts/PatrickHand.ttf') format('truetype'); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0b0a08; color:#efe9da; font-family:'Hand','Segoe UI',sans-serif; overflow-x:hidden;
+    background-image:radial-gradient(ellipse 80% 420px at 50% -60px, rgba(255,166,47,.13), transparent 70%); }
+  body::after { content:""; position:fixed; right:-70px; bottom:-30px; width:min(92vw,620px); height:min(92vw,620px);
+    background:url(../bg-silhouette.webp) no-repeat center/contain; opacity:.10; mix-blend-mode:screen; pointer-events:none; z-index:0;
+    animation:drift 16s ease-in-out infinite alternate; }
+  @keyframes drift { from { transform:translateY(0) } to { transform:translateY(-16px) } }
+  .wrap { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:0 18px 54px; }
+
+  .topbar { margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
+    padding:14px 22px; color:#f3e9cf;
+    background:linear-gradient(180deg,#4a3220 0%,#3a2a16 55%,#2e2010 100%);
+    border:3px solid #1c1206; border-radius:14px 4px 16px 5px/5px 16px 4px 14px;
+    box-shadow:7px 7px 0 rgba(0,0,0,.55), inset 0 0 0 2px rgba(243,233,207,.08); transform:rotate(-.3deg); }
+  .logo { font-family:'Marker',cursive; font-size:27px; letter-spacing:1px; color:#f7f1de; text-shadow:3px 3px 0 rgba(0,0,0,.45); text-decoration:none; }
+  .logo span { color:#ffa62f; }
+  .topbar .tags { font-size:15px; letter-spacing:2.5px; color:#d8c9a3; }
+
+  h1 { font-family:'Marker',cursive; font-weight:400; font-size:clamp(40px,8vw,62px); color:#f7f1de;
+    text-shadow:5px 5px 0 rgba(0,0,0,.5); transform:rotate(-.6deg); line-height:1.02; margin-top:40px; }
+  h1 .gold { color:#ffb52e; }
+  .sub { margin-top:12px; font-size:18px; color:#cfc7ae; max-width:560px; }
+  .joined { margin-top:10px; font-size:17px; color:#8fae9d; }
+  .joined b { color:#ffb52e; }
+
+  .check { margin-top:28px; background:#12100c; border:3px solid #2c2618; border-radius:6px 18px 5px 16px/16px 5px 18px 6px; padding:26px 24px 22px; color:#f3ead2;
+    box-shadow:7px 7px 0 rgba(0,0,0,.45); }
+  .checkrow { display:flex; gap:10px; flex-wrap:wrap; }
+  .checkrow input { flex:1 1 260px; background:#1c1913; border:2px solid #3a3320; border-radius:8px; color:#f3ead2; font-size:17px; padding:13px 15px; font-family:inherit; }
+  .checkrow button { font-family:'Marker',cursive; font-size:19px; letter-spacing:1px; background:#2fbf5a; color:#0d2013; border:3px solid #12351c; border-radius:14px 5px 16px 6px/6px 16px 5px 14px; padding:11px 26px; cursor:pointer; box-shadow:4px 5px 0 rgba(0,0,0,.5); }
+  .checkrow button:active { transform:translate(2px,2px); box-shadow:2px 3px 0 rgba(0,0,0,.5); }
+  .checkmsg { margin-top:14px; font-size:17px; min-height:24px; }
+  .checkmsg.ok { color:#3ecf6f; }
+  .checkmsg.err { color:#ff9a7a; }
+  .checkpanel { display:none; margin-top:14px; border:2px dashed #3a3320; border-radius:10px; padding:16px 18px; }
+  .checkpanel.show { display:block; }
+  .checkpanel .big { font-family:'Marker',cursive; font-size:24px; margin-bottom:12px; }
+  .checkpanel.found { border-color:#2fbf5a; }
+  .checkpanel.found .big { color:#3ecf6f; }
+  .checkpanel.missing .big { color:#ffb52e; }
+  .sharebtn, .joinbtn { display:inline-block; font-family:'Marker',cursive; font-size:19px; letter-spacing:1px; text-decoration:none; border-radius:14px 5px 16px 6px/6px 16px 5px 14px; padding:11px 24px; cursor:pointer; box-shadow:4px 5px 0 rgba(0,0,0,.5); }
+  .sharebtn { background:#ffb52e; color:#241a02; border:3px solid #6b4e05; }
+  .joinbtn { background:#2fbf5a; color:#0d2013; border:3px solid #12351c; }
+  .sharebtn:active, .joinbtn:active { transform:translate(2px,2px); box-shadow:2px 3px 0 rgba(0,0,0,.5); }
+
+  .foot { margin-top:34px; font-size:14.5px; letter-spacing:2px; color:#8a7f63; text-align:center; }
+  .foot a { color:#ffb52e; text-decoration:none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a class="logo" href="../">DOTGENT<span>.</span></a>
+    <div class="tags">THE HOODED AGENTS &mdash; WHITELIST CHECK</div>
+  </div>
+
+  <h1>Are you<br>on the <span class="gold">list?</span></h1>
+  <p class="sub">Paste your EVM wallet address &mdash; or your X username &mdash; and we will tell you straight away whether your spot is saved.</p>
+  <div class="joined" id="joinedLine">The gate is open. <b>0</b> archers on the list so far.</div>
+
+  <div class="check" id="check">
+    <div class="checkrow">
+      <input id="checkInput" type="text" placeholder="0x... wallet or @username" autocomplete="off" spellcheck="false">
+      <button id="checkBtn" type="button">CHECK</button>
+    </div>
+    <div class="checkmsg" id="checkMsg"></div>
+    <div class="checkpanel found" id="checkFound">
+      <div class="big">&#127993; You're on the list!</div>
+      <a class="sharebtn" id="shareBtn" href="#" target="_blank" rel="noopener">SHARE ON X &#8599;</a>
+    </div>
+    <div class="checkpanel missing" id="checkMissing">
+      <div class="big">Not on the list yet.</div>
+      <a class="joinbtn" href="/waitlist/">JOIN THE WAITLIST &#8599;</a>
+    </div>
+  </div>
+
+  <div class="foot">THE HOODED AGENTS &mdash; 3,000 SEALED &mdash; ROBINHOOD CHAIN &mdash; <a href="../">DOTGENT.XYZ</a></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var API = "https://dotgent-giveaway.reuniakbarpunk212.workers.dev";
+  var checkInput = document.getElementById("checkInput");
+  var checkMsg = document.getElementById("checkMsg");
+  var checkFound = document.getElementById("checkFound");
+  var checkMissing = document.getElementById("checkMissing");
+  var SHARE_TEXT = "I'm in \u{1F3F9}\n\nJust secured my spot on the @dotgent_ whitelist \u2014 The Hooded Agents, 3,000 sealed archers on Robinhood Chain. One 1/1 Hooded King is hiding in the supply.\n\nCheck your spot before the gate fills up \u{1F447}\nhttps://dotgent.xyz/waitlist/";
+
+  fetch(API + "/waitlist/count").then(function(r){ return r.json(); }).then(function(d){
+    if (d && typeof d.count === "number") {
+      document.getElementById("joinedLine").innerHTML = "The gate is open. <b>" + d.count + "</b> archers on the list so far.";
+    }
+  }).catch(function(){});
+
+  function runCheck(){
+    var v = checkInput.value.trim();
+    checkFound.classList.remove("show"); checkMissing.classList.remove("show");
+    if (!v) { checkMsg.textContent = "Paste a wallet address or X username first."; checkMsg.className = "checkmsg err"; return; }
+    var q = /^0x[0-9a-fA-F]{40}$/.test(v) ? "wallet=" + encodeURIComponent(v.toLowerCase())
+          : "x=" + encodeURIComponent(v.replace(/^@+/, ""));
+    checkMsg.textContent = "Checking the list..."; checkMsg.className = "checkmsg";
+    fetch(API + "/waitlist/pass?" + q).then(function(r){ return r.json(); }).then(function(d){
+      if (d && d.found) {
+        checkMsg.textContent = "@" + d.x + " \u00b7 wallet " + d.wallet.slice(0, 6) + "..." + d.wallet.slice(-4) + " \u00b7 " + (d.pts || 0) + " PTS. See you at the gate.";
+        checkMsg.className = "checkmsg ok";
+        document.getElementById("shareBtn").href = "https://x.com/intent/post?text=" + encodeURIComponent(SHARE_TEXT);
+        checkFound.classList.add("show");
+      } else {
+        checkMsg.textContent = "";
+        checkMissing.classList.add("show");
+      }
+    }).catch(function(){
+      checkMsg.textContent = "The gate didn't answer. Try again in a moment.";
+      checkMsg.className = "checkmsg err";
+    });
+  }
+  document.getElementById("checkBtn").addEventListener("click", runCheck);
+  checkInput.addEventListener("keydown", function(ev){ if (ev.key === "Enter") { ev.preventDefault(); runCheck(); } });
+  checkInput.focus();
+})();
+</script>
+</body>
+</html>
