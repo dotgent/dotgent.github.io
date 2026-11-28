@@ -111,6 +111,23 @@
     .stat .n { font-size: 24px; }
   }
 </style>
+<style>
+  @media (max-width: 640px) {
+    .hero { padding-top: 30px; display: flex; flex-direction: column; align-items: center; }
+    .hero .label { font-size: 10px; letter-spacing: .22em; padding: 0 12px; order: 0; }
+    .giant { font-size: 13.5vw; order: 2; }
+    .figure { order: 1; margin-top: 14px; width: min(340px, 88vw); }
+    .figure img { -webkit-mask-image: none; mask-image: none; }
+    .pedestal { display: none; }
+    .hero-copy { order: 3; margin-top: 20px; }
+    .moon { width: 46px !important; height: 46px !important; top: 82px !important; right: 4% !important; opacity: .95; }
+    .hero-copy .big { font-size: 22px; }
+    .ridge { height: 110px; }
+    .ridge.front { height: 88px; }
+    .marquee { font-size: 11px; letter-spacing: .18em; }
+  }
+  }
+</style>
 </head>
 <body>
 
@@ -128,7 +145,7 @@
   <div class="label">A collection in dark crystal · Robinhood Chain</div>
   <div class="giant">Hooded</div>
   <div class="giant solid">Agents</div>
-  <div class="figure"><img src="vault/hero.webp" alt="Hooded Agent No. 001 — ruby"></div>
+  <div class="figure"><img src="vault/hero-cut.png" alt="Hooded Agent No. 001 — ruby"></div>
   <div class="pedestal"></div>
   <div class="hero-copy">
     <div class="big">They were <em>cast,</em> not drawn.</div>
