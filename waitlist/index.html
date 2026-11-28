@@ -57,6 +57,10 @@
   .task.done .what .t, .task.done .what .s { opacity:.45; }
   .task.done .pts { color:#3ecf6f; }
   .task.done .go { background:#3ecf6f; border-color:#3ecf6f; color:#0d2013; }
+  .tasklink { padding:2px 4px 20px 48px; border-bottom:3px solid #efe9da; }
+  .tasklink .hint { margin-top:8px; font-size:15.5px; line-height:1.45; color:#a99f83; }
+  .tasklink .hint.ok { color:#3ecf6f; }
+  .tasklink .hint.err { color:#ff7a6b; }
 
   /* ── access pass ── */
   .pass { margin-top:42px; background:#12100c; border:3px solid #2c2618; position:relative;
@@ -121,9 +125,13 @@
     </div>
     <div class="task" id="task-repost">
       <div class="num">02</div>
-      <div class="what"><div class="t">Like &amp; repost</div><div class="s">The pinned post</div></div>
+      <div class="what"><div class="t">Like &amp; quote post</div><div class="s">The pinned post — then paste your link below</div></div>
       <div class="pts">+20 pts</div>
       <a class="go" data-task="repost" href="https://x.com/dotgent_" target="_blank" rel="noopener">&#8599;</a>
+    </div>
+    <div class="tasklink" id="repostRow">
+      <input id="repostLink" type="url" placeholder="Paste your quote link — x.com/you/status/123..." autocomplete="off" spellcheck="false">
+      <div class="hint" id="repostHint">A plain repost has no link of its own — quote the pinned post, then paste the link to your quote here. The +20 pts land when the link checks out.</div>
     </div>
     <div class="task" id="task-bell">
       <div class="num">03</div>
@@ -173,6 +181,11 @@
 
   var done = {};
   try { done = JSON.parse(localStorage.getItem("dgt_wl_tasks") || "{}"); } catch(e) { done = {}; }
+  var repostUrl = "";
+  try { repostUrl = localStorage.getItem("dgt_wl_repost") || ""; } catch(e) {}
+  // Task 2 used to complete on a tap. It now needs the quote link, so a
+  // stored "done" without a link no longer counts.
+  if (done.repost && !repostUrl) done.repost = false;
   var myPass = null;
   try { myPass = JSON.parse(localStorage.getItem("dgt_wl_pass") || "null"); } catch(e) { myPass = null; }
 
@@ -220,11 +233,39 @@
   document.querySelectorAll(".go").forEach(function(a){
     a.addEventListener("click", function(){
       var k = a.getAttribute("data-task");
+      if (k === "repost") return; // completes only when the quote link checks out
       done[k] = true;
       try { localStorage.setItem("dgt_wl_tasks", JSON.stringify(done)); } catch(e) {}
       render();
     });
   });
+
+  var repostInput = document.getElementById("repostLink");
+  var repostHint = document.getElementById("repostHint");
+  var REPOST_RE = /^https:\/\/(x\.com|twitter\.com)\/([A-Za-z0-9_]{1,15})\/status\/\d+/i;
+  function checkRepost(){
+    var v = repostInput.value.trim();
+    var m = v.match(REPOST_RE);
+    if (!v) {
+      repostHint.textContent = "A plain repost has no link of its own — quote the pinned post, then paste the link to your quote here. The +20 pts land when the link checks out.";
+      repostHint.className = "hint";
+    } else if (m) {
+      repostHint.textContent = "Link locked in — @" + m[2] + ". Make sure the handle matches the X username you enter below.";
+      repostHint.className = "hint ok";
+    } else {
+      repostHint.textContent = "That doesn't look like a link to an X post. Open your quote post, copy its link, and paste it here.";
+      repostHint.className = "hint err";
+    }
+    repostUrl = m ? v : "";
+    done.repost = !!m;
+    try {
+      localStorage.setItem("dgt_wl_tasks", JSON.stringify(done));
+      if (m) localStorage.setItem("dgt_wl_repost", v); else localStorage.removeItem("dgt_wl_repost");
+    } catch(e) {}
+    render();
+  }
+  repostInput.addEventListener("input", checkRepost);
+  if (repostUrl) { repostInput.value = repostUrl; checkRepost(); }
 
   function setMsg(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
 
@@ -235,13 +276,21 @@
     var w = wInput.value.trim();
     if (!/^[A-Za-z0-9_]{1,15}$/.test(x)) { setMsg("That X handle doesn't look right.", "err"); return; }
     if (!/^0x[0-9a-fA-F]{40}$/.test(w)) { setMsg("That wallet address doesn't look right.", "err"); return; }
+    var rm = (repostUrl || "").match(REPOST_RE);
+    if (!rm) { setMsg("Paste the link to your quote post first — task 2 needs it.", "err"); return; }
+    if (rm[2].toLowerCase() !== x.toLowerCase()) { setMsg("That quote link is from @" + rm[2] + ", not @" + x + ". Paste the link to your own quote post.", "err"); return; }
     ctaBtn.disabled = true; ctaTxt.textContent = "Carving your number...";
     fetch(API + "/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ x: x, wallet: w, pts: ptsTotal() })
+      body: JSON.stringify({ x: x, wallet: w, pts: ptsTotal(), repost: repostUrl })
     }).then(function(r){ return r.json(); }).then(function(d){
-      if (!d || !d.ok) { setMsg("Something jammed at the gate. Try again.", "err"); ctaBtn.disabled = false; ctaTxt.textContent = "Get my number"; return; }
+      if (!d || !d.ok) {
+        var why = d && d.error === "repost_link_handle_mismatch" ? "The quote link must be from your own account."
+          : d && d.error === "repost_link_required" ? "The gate now needs your quote link — paste it under task 2."
+          : "Something jammed at the gate. Try again.";
+        setMsg(why, "err"); ctaBtn.disabled = false; ctaTxt.textContent = "Get my number"; return;
+      }
       myPass = { pass: d.pass, x: x, wallet: w.toLowerCase() };
       try { localStorage.setItem("dgt_wl_pass", JSON.stringify(myPass)); } catch(e) {}
       setMsg(d.duplicate ? "You were already on the list — here's your number." : "You're in. Number carved.", "ok");
