@@ -4,79 +4,74 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DOTGENT — Check Your Spot | The Hooded Agents</title>
-<meta name="description" content="Check if your wallet is on The Hooded Agents whitelist. Paste your EVM address or X username — 3,000 sealed hooded archers on Robinhood Chain.">
+<meta name="description" content="Check if your wallet is on The Hooded Agents waitlist. Paste your EVM address or X username — 3,000 sealed hooded archers in dark crystal on Robinhood Chain.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dotgent">
 <meta property="og:title" content="Dotgent — Check Your Spot">
-<meta property="og:description" content="Are you on the list? Check your whitelist spot for The Hooded Agents.">
+<meta property="og:description" content="Are you on the list? Check your waitlist spot for The Hooded Agents.">
 <meta property="og:url" content="https://dotgent.xyz/check/">
 <meta property="og:image" content="https://dotgent.xyz/waitlist/pass-card.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Dotgent — Check Your Spot">
-<meta name="twitter:description" content="Are you on the list? Check your whitelist spot for The Hooded Agents.">
+<meta name="twitter:description" content="Are you on the list? Check your waitlist spot for The Hooded Agents.">
 <meta name="twitter:image" content="https://dotgent.xyz/waitlist/pass-card.png">
 <style>
-  @font-face { font-family:'Marker'; src:url('../fonts/PermanentMarker.ttf') format('truetype'); }
-  @font-face { font-family:'Hand'; src:url('../fonts/PatrickHand.ttf') format('truetype'); }
+  @font-face { font-family:'Grotesk'; src:url('../fonts/SpaceGrotesk.ttf'); }
+  @font-face { font-family:'Inter'; src:url('../fonts/Inter.ttf'); }
+  @font-face { font-family:'SerifIt'; src:url('../fonts/InstrumentSerif-Italic.ttf'); }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { background:#0b0a08; color:#efe9da; font-family:'Hand','Segoe UI',sans-serif; overflow-x:hidden;
-    background-image:radial-gradient(ellipse 80% 420px at 50% -60px, rgba(255,166,47,.13), transparent 70%); }
-  body::after { content:""; position:fixed; right:-70px; bottom:-30px; width:min(92vw,620px); height:min(92vw,620px);
-    background:url(../bg-silhouette.webp) no-repeat center/contain; opacity:.10; mix-blend-mode:screen; pointer-events:none; z-index:0;
-    animation:drift 16s ease-in-out infinite alternate; }
-  @keyframes drift { from { transform:translateY(0) } to { transform:translateY(-16px) } }
-  .wrap { position:relative; z-index:1; max-width:760px; margin:0 auto; padding:0 18px 54px; }
-
-  .topbar { margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
-    padding:14px 22px; color:#f3e9cf;
-    background:linear-gradient(180deg,#4a3220 0%,#3a2a16 55%,#2e2010 100%);
-    border:3px solid #1c1206; border-radius:14px 4px 16px 5px/5px 16px 4px 14px;
-    box-shadow:7px 7px 0 rgba(0,0,0,.55), inset 0 0 0 2px rgba(243,233,207,.08); transform:rotate(-.3deg); }
-  .logo { font-family:'Marker',cursive; font-size:27px; letter-spacing:1px; color:#f7f1de; text-shadow:3px 3px 0 rgba(0,0,0,.45); text-decoration:none; }
-  .logo span { color:#ffa62f; }
-  .topbar .tags { font-size:15px; letter-spacing:2.5px; color:#d8c9a3; }
-
-  h1 { font-family:'Marker',cursive; font-weight:400; font-size:clamp(40px,8vw,62px); color:#f7f1de;
-    text-shadow:5px 5px 0 rgba(0,0,0,.5); transform:rotate(-.6deg); line-height:1.02; margin-top:40px; }
-  h1 .gold { color:#ffb52e; }
-  .sub { margin-top:12px; font-size:18px; color:#cfc7ae; max-width:560px; }
-  .joined { margin-top:10px; font-size:17px; color:#8fae9d; }
-  .joined b { color:#ffb52e; }
-
-  .check { margin-top:28px; background:#12100c; border:3px solid #2c2618; border-radius:6px 18px 5px 16px/16px 5px 18px 6px; padding:26px 24px 22px; color:#f3ead2;
-    box-shadow:7px 7px 0 rgba(0,0,0,.45); }
-  .checkrow { display:flex; gap:10px; flex-wrap:wrap; }
-  .checkrow input { flex:1 1 260px; background:#1c1913; border:2px solid #3a3320; border-radius:8px; color:#f3ead2; font-size:17px; padding:13px 15px; font-family:inherit; }
-  .checkrow button { font-family:'Marker',cursive; font-size:19px; letter-spacing:1px; background:#2fbf5a; color:#0d2013; border:3px solid #12351c; border-radius:14px 5px 16px 6px/6px 16px 5px 14px; padding:11px 26px; cursor:pointer; box-shadow:4px 5px 0 rgba(0,0,0,.5); }
-  .checkrow button:active { transform:translate(2px,2px); box-shadow:2px 3px 0 rgba(0,0,0,.5); }
-  .checkmsg { margin-top:14px; font-size:17px; min-height:24px; }
-  .checkmsg.ok { color:#3ecf6f; }
+  body { background:#04050a; color:#dfe4ee; font-family:'Inter',sans-serif; overflow-x:hidden; }
+  .label { font-size:11px; letter-spacing:.34em; text-transform:uppercase; color:#7e8aa5; }
+  .moon { position:fixed; top:54px; right:6%; width:150px; height:150px; border-radius:50%; z-index:0; pointer-events:none;
+    background:radial-gradient(circle at 42% 38%, #fbfdff, #d7e4f8 52%, #a9c0e4 78%, rgba(169,192,228,0) 79%);
+    box-shadow:0 0 70px 26px rgba(168,198,248,.16), 0 0 170px 70px rgba(140,175,235,.08); }
+  header { position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center; padding:20px 34px; border-bottom:1px solid rgba(255,255,255,.07); }
+  .wordmark { font-family:'Grotesk'; font-weight:700; font-size:19px; letter-spacing:.12em; color:#dfe4ee; text-decoration:none; }
+  .wordmark em { font-family:'SerifIt'; font-weight:400; letter-spacing:0; color:#9db8e8; }
+  .count { font-size:12px; letter-spacing:.22em; color:#7e8aa5; text-transform:uppercase; }
+  .count b { color:#e8eefc; font-weight:600; }
+  header nav a { color:#aeb9cf; text-decoration:none; font-size:13px; letter-spacing:.14em; text-transform:uppercase; margin-left:26px; }
+  .wrap { position:relative; z-index:1; max-width:680px; margin:0 auto; padding:70px 22px 40px; text-align:center; }
+  h1 { font-family:'Grotesk'; font-weight:700; font-size:clamp(38px,6.6vw,58px); line-height:1.03; text-transform:uppercase; margin:16px 0 14px; color:#eef2fb; }
+  h1 em { font-family:'SerifIt'; font-weight:400; text-transform:none; color:#9db8e8; }
+  .sub { font-size:15.5px; line-height:1.65; color:#8d99b2; max-width:50ch; margin:0 auto; }
+  .joined { margin-top:14px; font-size:14.5px; color:#7e8aa5; letter-spacing:.06em; }
+  .joined b { color:#e8eefc; }
+  .check { margin-top:36px; text-align:left; }
+  .checkrow { display:flex; gap:10px; }
+  .checkrow input { flex:1; background:#070a13; border:1px solid rgba(255,255,255,.16); color:#eef2fb; font-family:'Inter'; font-size:15.5px; padding:16px 18px; border-radius:999px; outline:none; min-width:0; }
+  .checkrow input::placeholder { color:#4d5870; }
+  .checkrow button { font-family:'Grotesk'; font-weight:700; letter-spacing:.16em; text-transform:uppercase; font-size:14px; background:#eef2fb; color:#04050a; border:0; padding:16px 30px; border-radius:999px; cursor:pointer; white-space:nowrap; }
+  .checkmsg { margin-top:16px; font-size:15px; min-height:24px; text-align:center; }
+  .checkmsg.ok { color:#8fe3ae; }
   .checkmsg.err { color:#ff9a7a; }
-  .checkpanel { display:none; margin-top:14px; border:2px dashed #3a3320; border-radius:10px; padding:16px 18px; }
+  .checkpanel { display:none; margin-top:20px; padding:26px; text-align:left; }
   .checkpanel.show { display:block; }
-  .checkpanel .big { font-family:'Marker',cursive; font-size:24px; margin-bottom:12px; }
-  .checkpanel.found { border-color:#2fbf5a; }
-  .checkpanel.found .big { color:#3ecf6f; }
-  .checkpanel.missing .big { color:#ffb52e; }
-  .sharebtn, .joinbtn { display:inline-block; font-family:'Marker',cursive; font-size:19px; letter-spacing:1px; text-decoration:none; border-radius:14px 5px 16px 6px/6px 16px 5px 14px; padding:11px 24px; cursor:pointer; box-shadow:4px 5px 0 rgba(0,0,0,.5); }
-  .sharebtn { background:#ffb52e; color:#241a02; border:3px solid #6b4e05; }
-  .joinbtn { background:#2fbf5a; color:#0d2013; border:3px solid #12351c; }
-  .sharebtn:active, .joinbtn:active { transform:translate(2px,2px); box-shadow:2px 3px 0 rgba(0,0,0,.5); }
-
-  .foot { margin-top:34px; font-size:14.5px; letter-spacing:2px; color:#8a7f63; text-align:center; }
-  .foot a { color:#ffb52e; text-decoration:none; }
+  .checkpanel.found { border:1px solid rgba(140,220,170,.35); background:linear-gradient(180deg, rgba(80,200,130,.08), rgba(255,255,255,.012)); }
+  .checkpanel.missing { border:1px solid rgba(255,255,255,.14); background:linear-gradient(180deg, rgba(120,150,210,.06), rgba(255,255,255,.012)); }
+  .checkpanel .big { font-family:'Grotesk'; font-weight:700; font-size:24px; letter-spacing:.06em; text-transform:uppercase; margin-bottom:14px; }
+  .checkpanel.found .big { color:#a9e8c3; }
+  .checkpanel.missing .big { color:#eef2fb; }
+  .sharebtn, .joinbtn { display:inline-block; font-family:'Grotesk'; font-weight:600; font-size:13px; letter-spacing:.16em; text-transform:uppercase; text-decoration:none; padding:11px 20px; border-radius:999px; }
+  .sharebtn { background:#a9e8c3; color:#04050a; }
+  .joinbtn { background:#eef2fb; color:#04050a; }
+  footer { position:relative; z-index:1; margin-top:60px; padding:22px 34px 30px; display:flex; justify-content:space-between; font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:#4d5870; border-top:1px solid rgba(255,255,255,.07); }
+  footer a { color:#7e8aa5; text-decoration:none; }
+  @media (max-width:860px){ header nav, .count { display:none; } .checkrow { flex-direction:column; } }
 </style>
 </head>
 <body>
+<div class="moon"></div>
+<header>
+  <a class="wordmark" href="../">DOTGENT <em>— the vault</em></a>
+  <div class="count">Waitlist — <b>check below</b></div>
+  <nav><a href="../#vault">Vault</a><a href="../#king">The King</a><a href="../check/">Check</a></nav>
+</header>
+
 <div class="wrap">
-
-  <div class="topbar">
-    <a class="logo" href="../">DOTGENT<span>.</span></a>
-    <div class="tags">THE HOODED AGENTS &mdash; WHITELIST CHECK</div>
-  </div>
-
-  <h1>Are you<br>on the <span class="gold">list?</span></h1>
-  <p class="sub">Paste your EVM wallet address &mdash; or your X username &mdash; and we will tell you straight away whether your spot is saved.</p>
+  <div class="label">The list · Check</div>
+  <h1>Are you<br>on the <em>list?</em></h1>
+  <p class="sub">One list holds every guaranteed spot, every collab holder, every name in line. Search it with your wallet or your X username.</p>
   <div class="joined" id="joinedLine">The gate is open. <b>0</b> archers on the list so far.</div>
 
   <div class="check" id="check">
@@ -94,9 +89,12 @@
       <a class="joinbtn" href="/waitlist/">JOIN THE WAITLIST &#8599;</a>
     </div>
   </div>
-
-  <div class="foot">THE HOODED AGENTS &mdash; 3,000 SEALED &mdash; ROBINHOOD CHAIN &mdash; <a href="../">DOTGENT.XYZ</a></div>
 </div>
+
+<footer>
+  <span>Dotgent — The Hooded Agents</span>
+  <span><a href="../">dotgent.xyz</a></span>
+</footer>
 
 <script>
 (function(){

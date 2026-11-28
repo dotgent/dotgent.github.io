@@ -3,182 +3,204 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DOTGENT NFT — The Hooded Agents</title>
-<meta name="description" content="3,000 sealed hooded archers on Robinhood Chain. Every mint is sealed until the reveal. One 1/1 Hooded King.">
+<title>DOTGENT — The Hooded Agents | 3,000 Sealed Archers on Robinhood Chain</title>
+<meta name="description" content="The Hooded Agents — 3,000 sealed archers cast in dark crystal on Robinhood Chain. One 1/1 Hooded King hides in the supply. Join the waitlist.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Dotgent">
+<meta property="og:title" content="Dotgent — The Hooded Agents">
+<meta property="og:description" content="3,000 sealed archers in dark crystal. One king, hidden. The waitlist is open.">
+<meta property="og:url" content="https://dotgent.xyz/">
+<meta property="og:image" content="https://dotgent.xyz/vault/hero.webp">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dotgent — The Hooded Agents">
+<meta name="twitter:description" content="3,000 sealed archers in dark crystal. One king, hidden. The waitlist is open.">
+<meta name="twitter:image" content="https://dotgent.xyz/vault/hero.webp">
 <style>
-  @font-face { font-family:'Marker'; src:url('fonts/PermanentMarker.ttf') format('truetype'); }
-  @font-face { font-family:'Hand'; src:url('fonts/PatrickHand.ttf') format('truetype'); }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
-  body { background:#0b0a08; color:#efe9da; font-family:'Hand', 'Segoe UI', sans-serif; overflow-x:hidden;
-    background-image:radial-gradient(ellipse 80% 420px at 50% -60px, rgba(255,166,47,.13), transparent 70%); }
-  body::after { content:""; position:fixed; right:-70px; bottom:-30px; width:min(92vw,620px); height:min(92vw,620px);
-    background:url(bg-silhouette.webp) no-repeat center/contain; opacity:.12; mix-blend-mode:screen; pointer-events:none; z-index:0;
-    animation:drift 16s ease-in-out infinite alternate; }
-  @keyframes drift { from { transform:translateY(0) } to { transform:translateY(-16px) } }
-  .wrap { position:relative; z-index:1; max-width:1180px; margin:0 auto; padding:0 18px 46px; }
+  @font-face { font-family: 'Grotesk'; src: url('fonts/SpaceGrotesk.ttf'); }
+  @font-face { font-family: 'Inter'; src: url('fonts/Inter.ttf'); }
+  @font-face { font-family: 'SerifIt'; src: url('fonts/InstrumentSerif-Italic.ttf'); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #04050a; color: #dfe4ee; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+  .label { font-size: 11px; letter-spacing: .34em; text-transform: uppercase; color: #7e8aa5; }
+  /* ---------- top bar ---------- */
+  header { display: flex; justify-content: space-between; align-items: center; padding: 20px 34px; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .wordmark { font-family: 'Grotesk'; font-weight: 700; font-size: 19px; letter-spacing: .12em; }
+  .wordmark em { font-family: 'SerifIt'; font-weight: 400; letter-spacing: 0; color: #9db8e8; }
+  .count { font-size: 12px; letter-spacing: .22em; color: #7e8aa5; text-transform: uppercase; }
+  .count b { color: #e8eefc; font-weight: 600; }
+  header nav a { color: #aeb9cf; text-decoration: none; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; margin-left: 26px; }
+  /* ---------- hero ---------- */
+  .hero { position: relative; text-align: center; padding: 54px 20px 0; overflow: hidden;
+    background: radial-gradient(52% 38% at 50% 30%, rgba(70,110,190,.16), transparent 70%); }
+  .hero .label { margin-bottom: 18px; }
+  .giant { font-family: 'Grotesk'; font-weight: 700; font-size: clamp(64px, 13.5vw, 168px); line-height: .92; letter-spacing: .01em; color: transparent;
+    -webkit-text-stroke: 1.5px rgba(190,208,240,.4); text-transform: uppercase; }
+  .giant.solid { color: #eef2fb; -webkit-text-stroke: 0; }
+  .figure { position: relative; margin: -34px auto 0; width: min(400px, 74vw); }
+  .figure img { width: 100%; display: block; border-radius: 6px;
+    -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent 99%); mask-image: linear-gradient(180deg, #000 82%, transparent 99%); }
+  .pedestal { height: 54px; margin: -30px auto 0; width: min(520px, 88vw);
+    background: radial-gradient(50% 100% at 50% 0%, rgba(160,190,240,.28), transparent 70%); }
+  .hero-copy { max-width: 620px; margin: 6px auto 0; padding: 0 16px; }
+  .hero-copy .big { font-size: 25px; line-height: 1.4; color: #e8eefc; }
+  .hero-copy .big em { font-family: 'SerifIt'; font-size: 29px; color: #9db8e8; }
+  .hero-copy p { margin-top: 12px; font-size: 15px; line-height: 1.65; color: #8d99b2; }
+  .textlink { display: inline-block; margin-top: 22px; font-family: 'Grotesk'; font-weight: 600; font-size: 15px; letter-spacing: .18em; text-transform: uppercase; color: #eef2fb; text-decoration: none; border-bottom: 1px solid #9db8e8; padding-bottom: 5px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); max-width: 880px; margin: 52px auto 0; border-top: 1px solid rgba(255,255,255,.09); }
+  .stat { padding: 20px 10px 26px; border-left: 1px solid rgba(255,255,255,.09); }
+  .stat:first-child { border-left: 0; }
+  .stat .n { font-family: 'Grotesk'; font-weight: 700; font-size: 32px; color: #eef2fb; }
+  .stat .t { margin-top: 4px; font-size: 11px; letter-spacing: .28em; text-transform: uppercase; color: #7e8aa5; }
+  /* ---------- marquee ---------- */
+  .marquee { border-top: 1px solid rgba(255,255,255,.09); border-bottom: 1px solid rgba(255,255,255,.09); padding: 13px 0; white-space: nowrap; overflow: hidden;
+    font-family: 'Grotesk'; font-size: 13px; letter-spacing: .4em; color: #5f6d88; text-transform: uppercase; text-align: center; }
+  /* ---------- vault ---------- */
+  .vault { padding: 74px 34px 10px; max-width: 1240px; margin: 0 auto; }
+  .vault-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 34px; }
+  .vault-head h2 { font-family: 'Grotesk'; font-weight: 700; font-size: 40px; text-transform: uppercase; letter-spacing: .02em; }
+  .vault-head h2 em { font-family: 'SerifIt'; font-weight: 400; text-transform: none; color: #9db8e8; font-size: 44px; }
+  .row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+  .piece { }
+  .piece .frame { background: linear-gradient(180deg, rgba(120,150,210,.07), rgba(255,255,255,.012)); border: 1px solid rgba(255,255,255,.08); padding: 20px 14px 0; }
+  .piece img { width: 100%; display: block; -webkit-mask-image: linear-gradient(180deg, #000 84%, transparent 99%); mask-image: linear-gradient(180deg, #000 84%, transparent 99%); }
+  .piece .floor { height: 20px; background: radial-gradient(50% 100% at 50% 0%, rgba(160,190,240,.20), transparent 70%); }
+  .piece .meta { display: flex; justify-content: space-between; align-items: baseline; padding: 13px 2px 0; }
+  .piece .name { font-family: 'Grotesk'; font-weight: 600; font-size: 16px; letter-spacing: .22em; }
+  .piece .num { font-family: 'SerifIt'; font-size: 19px; color: #7e8aa5; }
+  .piece .desc { padding: 4px 2px 0; font-size: 13px; color: #8d99b2; line-height: 1.55; }
+  /* ---------- king ---------- */
+  .king { max-width: 1240px; margin: 84px auto 0; padding: 0 34px; display: grid; grid-template-columns: 1.1fr .9fr; gap: 44px; align-items: center; }
+  .king h2 { font-family: 'Grotesk'; font-weight: 700; font-size: 46px; line-height: 1.05; text-transform: uppercase; }
+  .king h2 em { font-family: 'SerifIt'; font-weight: 400; text-transform: none; color: #d9b45c; font-size: 52px; }
+  .king p { margin-top: 16px; font-size: 15.5px; line-height: 1.7; color: #8d99b2; max-width: 48ch; }
+  .king img { width: 100%; max-width: 400px; justify-self: center; display: block;
+    -webkit-mask-image: linear-gradient(180deg, #000 84%, transparent 99%); mask-image: linear-gradient(180deg, #000 84%, transparent 99%); }
+  /* ---------- join ---------- */
+  .join { text-align: center; padding: 100px 20px 84px; margin-top: 84px; border-top: 1px solid rgba(255,255,255,.09);
+    background: radial-gradient(46% 60% at 50% 100%, rgba(70,110,190,.13), transparent 70%); }
+  .join h2 { font-family: 'Grotesk'; font-weight: 700; font-size: clamp(38px, 6.4vw, 66px); text-transform: uppercase; line-height: 1.02; }
+  .join h2 em { font-family: 'SerifIt'; font-weight: 400; text-transform: none; color: #9db8e8; }
+  .join p { margin: 16px auto 0; max-width: 52ch; font-size: 15.5px; line-height: 1.65; color: #8d99b2; }
+  .join .actions { margin-top: 30px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn { font-family: 'Grotesk'; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; font-size: 14px; text-decoration: none; padding: 15px 30px; border-radius: 999px; }
+  .btn.fill { background: #eef2fb; color: #04050a; }
+  .btn.line { border: 1px solid rgba(255,255,255,.28); color: #eef2fb; }
+  footer { padding: 22px 34px 30px; display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .24em; text-transform: uppercase; color: #4d5870; border-top: 1px solid rgba(255,255,255,.07); }
 
-  /* ── wooden sign topbar ── */
-  .topbar { margin-top:16px; display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap;
-    padding:14px 22px; color:#f3e9cf;
-    background:linear-gradient(180deg,#4a3220 0%,#3a2a16 55%,#2e2010 100%);
-    border:3px solid #1c1206; border-radius:14px 4px 16px 5px/5px 16px 4px 14px;
-    box-shadow:7px 7px 0 rgba(0,0,0,.55), inset 0 0 0 2px rgba(243,233,207,.08); transform:rotate(-.3deg); }
-  .logo { font-family:'Marker', cursive; font-size:27px; letter-spacing:1px; color:#f7f1de; text-shadow:3px 3px 0 rgba(0,0,0,.45); }
-  .logo span { color:#ffa62f; }
-  .topbar .tags { font-size:15px; letter-spacing:2.5px; color:#d8c9a3; }
+  .hero > *:not(.silh):not(.skyline) { position: relative; z-index: 1; }
+  .silh { position: absolute; z-index: 0; pointer-events: none; opacity: .8; object-fit: contain; }
+  .silh.left { left: 2.5%; top: 400px; width: 215px; height: 330px; transform: scaleX(-1); }
+  .silh.right { right: 2.5%; top: 400px; width: 215px; height: 330px; }
+  .skyline { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 110px; z-index: 0; pointer-events: none; }
+  .king .silh-k { position: absolute; right: 2%; top: -10px; width: 190px; opacity: .45; pointer-events: none; }
 
-  .rope { height:0; border-top:4px dashed #6b543a; margin:26px 6px 0; opacity:.7; }
-
-  /* ── hero ── */
-  .hero { display:flex; gap:44px; padding:44px 6px 8px; align-items:center; flex-wrap:wrap; }
-  .hero-text { flex:1 1 430px; }
-  .sticker { display:inline-block; font-family:'Marker', cursive; font-size:15px; letter-spacing:1.5px; color:#0d2013;
-    background:#3ecf6f; padding:8px 16px 7px; transform:rotate(-2.5deg);
-    border-radius:4px 14px 5px 15px/15px 5px 14px 4px; box-shadow:5px 5px 0 rgba(0,0,0,.55); }
-  h1 { font-family:'Marker', cursive; font-weight:400; font-size:clamp(46px,7.4vw,84px); line-height:1.04; margin-top:20px;
-    color:#f7f1de; text-shadow:5px 5px 0 rgba(0,0,0,.5); transform:rotate(-.6deg); }
-  h1 .gold { color:#ffb52e; }
-  .sub { margin-top:20px; font-size:20px; line-height:1.55; color:#cfc7ae; max-width:490px; }
-  .sub b { color:#ffb52e; }
-  .scribble { margin-top:18px; font-size:17px; color:#8fae9d; transform:rotate(-.8deg); }
-  .scribble .arr { color:#ffb52e; font-size:20px; }
-
-  .hero-img { flex:0 1 400px; position:relative; transform:rotate(2deg); }
-  .photo { background:#f3ecd7; padding:14px 14px 12px; border-radius:6px 3px 8px 4px;
-    box-shadow:10px 12px 0 rgba(0,0,0,.5); position:relative; }
-  .photo img { width:100%; display:block; border-radius:3px; }
-  .photo::before, .photo::after { content:""; position:absolute; width:110px; height:30px; background:rgba(233,220,170,.75);
-    border-left:2px dashed rgba(120,100,50,.35); border-right:2px dashed rgba(120,100,50,.35); z-index:2; }
-  .photo::before { top:-14px; left:26px; transform:rotate(-7deg); }
-  .photo::after { top:-14px; right:26px; transform:rotate(6deg); }
-  .sealed-note { text-align:center; font-size:14.5px; letter-spacing:1.6px; color:#3a3125; margin-top:10px; }
-  .badge { position:absolute; right:-24px; bottom:34px; z-index:3; width:118px; height:118px; transform:rotate(10deg);
-    background:radial-gradient(circle,#ffc93d 0 58%,#e8a51c 60% 100%); border-radius:50%;
-    display:flex; align-items:center; justify-content:center; text-align:center;
-    font-family:'Marker', cursive; font-size:14.5px; line-height:1.25; color:#241703;
-    box-shadow:5px 6px 0 rgba(0,0,0,.5); border:3px dashed rgba(36,23,3,.5); }
-
-  /* ── mint board (parchment) ── */
-  .board { margin-top:52px; background:#efe3c0; color:#2b2113;
-    padding:30px 30px 26px; transform:rotate(-.35deg);
-    border-radius:18px 5px 20px 6px/6px 20px 5px 18px;
-    box-shadow:9px 10px 0 rgba(0,0,0,.55);
-    clip-path:polygon(0 1.5%, 4% 0, 22% .8%, 45% 0, 68% .9%, 88% 0, 100% 1.2%, 99.4% 30%, 100% 62%, 99.5% 100%, 76% 99.2%, 48% 100%, 24% 99.1%, 0 100%, .5% 66%, 0 34%); }
-  .board h2 { font-family:'Marker', cursive; font-weight:400; font-size:clamp(24px,3.6vw,34px); transform:rotate(-.5deg); }
-  .board h2 span { color:#b06f00; }
-  .board-row { display:flex; gap:30px; flex-wrap:wrap; align-items:center; margin-top:16px; }
-  .supply { flex:1 1 250px; position:relative; }
-  .soonstamp { position:absolute; top:2px; left:118px; transform:rotate(-9deg); z-index:2;
-    font-family:'Marker', cursive; font-size:27px; letter-spacing:3px; color:#b3402a;
-    border:3.5px solid #b3402a; border-radius:6px; padding:3px 14px 1px; opacity:.92;
-    background:rgba(239,227,192,.55); pointer-events:none; }
-  .supply .num { font-family:'Marker', cursive; font-size:52px; line-height:1; }
-  .supply .num small { font-size:24px; color:#7a6743; }
-  .inkbar { height:20px; margin-top:12px; background:#d9c894;
-    border:3px solid #2b2113; border-radius:12px 4px 13px 5px/5px 13px 4px 12px; overflow:hidden; transform:rotate(-.4deg); }
-  .inkbar i { display:block; height:100%; width:0%;
-    background:repeating-linear-gradient(-45deg,#2fbf5a 0 14px,#27a34b 14px 28px); }
-  .supply .lbl { font-size:15px; letter-spacing:3px; margin-top:9px; color:#5d4c2c; }
-  .mintbtn { flex:1 1 380px; text-align:center; }
-  .btnrow { display:flex; gap:16px; flex-wrap:wrap; }
-  .btnrow .osbtn { flex:1 1 200px; }
-  .osbtn { display:block; width:100%; padding:19px 14px; font-family:'Marker', cursive; font-size:21px; letter-spacing:.5px; position:relative;
-    background:#2fbf5a; color:#0d2013; text-decoration:none; transform:rotate(-1.2deg);
-    border:3px solid #12351c; border-radius:16px 5px 18px 6px/6px 18px 5px 16px;
-    box-shadow:6px 7px 0 rgba(20,15,5,.75); transition:transform .12s, box-shadow .12s; }
-  .btntag { position:absolute; top:-13px; right:14px; z-index:2; transform:rotate(2.5deg);
-    font-size:13px; letter-spacing:2.5px; line-height:1; padding:6px 12px 4px;
-    border:2.5px solid #1c1206; border-radius:999px; box-shadow:3px 3px 0 rgba(20,15,5,.45); }
-  .btntag.soon { background:#2b2113; color:#efe3c0; }
-  .btntag.live { background:#ffb52e; color:#171208; }
-  .btntag .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#1d7a3a;
-    margin-right:6px; vertical-align:1px; animation:pulse 1.6s ease-in-out infinite; }
-  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.35; } }
-  .osbtn:hover { transform:rotate(-1.2deg) translate(-2px,-2px); box-shadow:9px 10px 0 rgba(20,15,5,.75); }
-  .mintbtn p { font-size:14.5px; color:#5d4c2c; margin-top:14px; letter-spacing:1.2px; }
-
-  /* ── sealed manifesto ── */
-  .reveal { margin-top:54px; text-align:center; padding:42px 26px 40px; position:relative;
-    border:3.5px dashed #8a6d2f; border-radius:225px 18px 255px 18px/18px 255px 18px 225px; background:rgba(255,182,46,.045); }
-  .qseal { width:74px; height:74px; margin:0 auto 16px; border-radius:50%; transform:rotate(-8deg);
-    background:radial-gradient(circle at 35% 32%, #ffcf4d, #e8a51c 70%); border:3px solid #8a6d2f;
-    display:flex; align-items:center; justify-content:center;
-    font-family:'Marker', cursive; font-size:40px; color:#33230a; box-shadow:5px 6px 0 rgba(0,0,0,.5); }
-  .reveal h2 { font-family:'Marker', cursive; font-weight:400; font-size:clamp(24px,4vw,36px); color:#f7f1de; transform:rotate(-.4deg); }
-  .reveal h2 span { color:#ffb52e; }
-  .reveal p { color:#cfc7ae; margin:14px auto 0; font-size:18.5px; line-height:1.6; max-width:660px; }
-
-  /* ── footer ── */
-  footer { margin-top:50px; padding:16px 22px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
-    font-size:15.5px; letter-spacing:1.2px; color:#d8c9a3;
-    background:linear-gradient(180deg,#3a2a16 0%,#2e2010 100%);
-    border:3px solid #1c1206; border-radius:5px 15px 4px 14px/14px 4px 15px 5px;
-    box-shadow:7px 7px 0 rgba(0,0,0,.55); transform:rotate(.25deg); }
-  footer a { color:#3ecf6f; text-decoration:none; font-weight:700; }
-  footer a:hover { text-decoration:underline; }
-
-  @media (max-width:680px){
-    .hero { padding-top:30px; gap:30px; }
-    .badge { right:-6px; width:100px; height:100px; font-size:12.5px; }
-    .board { padding:24px 20px 22px; }
-    .supply .num { font-size:44px; }
-    .soonstamp { left:96px; font-size:22px; }
-    footer { justify-content:center; text-align:center; }
+  .hero > .scene { position: absolute !important; z-index: 0; }
+  .moon { top: 64px; right: 9%; width: 210px; height: 210px; border-radius: 50%;
+    background: radial-gradient(circle at 42% 38%, #fbfdff, #d7e4f8 52%, #a9c0e4 78%, rgba(169,192,228,0) 79%);
+    box-shadow: 0 0 90px 34px rgba(168,198,248,.20), 0 0 220px 90px rgba(140,175,235,.10); }
+  .ridge { left: 0; right: 0; bottom: 0; width: 100%; height: 168px; pointer-events: none; }
+  .ridge.front { height: 132px; }
+  .archer { right: 5.5%; bottom: 52px; height: 128px; pointer-events: none; }
+  @media (max-width: 860px) { .moon { width: 130px; height: 130px; right: 4%; top: 40px; } .archer { display: none; } }
+  @media (max-width: 860px) { .silh { display: none; } }
+  @media (max-width: 860px) {
+    .row { grid-template-columns: repeat(2, 1fr); }
+    .king { grid-template-columns: 1fr; }
+    header nav, .count { display: none; }
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .stat .n { font-size: 24px; }
   }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <div class="topbar">
-    <div class="logo">DOTGENT<span>.</span>NFT</div>
-    <div class="tags">ROBINHOOD CHAIN &nbsp;•&nbsp; ERC-721 &nbsp;•&nbsp; OPENSEA</div>
-  </div>
+<header>
+  <div class="wordmark">DOTGENT <em>— the vault</em></div>
+  <div class="count">Waitlist — <b><span id="wlCount">…</span> in</b></div>
+  <nav><a href="#vault">Vault</a><a href="#king">The King</a><a href="/check/">Check</a></nav>
+</header>
 
-  <div class="rope"></div>
-
-  <div class="hero">
-    <div class="hero-text">
-      <span class="sticker">SEALED UNTIL REVEAL</span>
-      <h1>THE HOODED<br>AGENTS <span class="gold">OF<br>SHERWOOD</span></h1>
-      <p class="sub">3,000 hooded archers on Robinhood Chain. Every mint is sealed — nobody knows which agent they hold until the reveal. One wallet walks away with the <b>1/1 Hooded King</b>.</p>
-      <p class="scribble"><span class="arr">→</span> that's him. no, you can't see his face. that's the point.</p>
-    </div>
-    <div class="hero-img">
-      <div class="photo">
-        <img src="/nft/sealed.webp" alt="Sealed Dotgent">
-        <div class="sealed-note">▲ WHAT EVERY MINT LOOKS LIKE — UNTIL REVEAL</div>
-      </div>
-      <div class="badge">ONE 1/1<br>HOODED<br>KING</div>
-    </div>
-  </div>
-
-  <div class="board">
-    <h2>THE MINT <span>BOARD</span></h2>
-    <div class="board-row">
-      <div class="mintbtn">
-        <div class="btnrow">
-          <a class="osbtn" href="https://opensea.io/collections/chain/robinhood" target="_blank" rel="noopener"><span class="btntag soon">COMING SOON</span>VIEW ON OPENSEA</a>
-          <a class="osbtn" href="/waitlist/"><span class="btntag live"><span class="dot"></span>LIVE</span>JOIN THE WAITLIST &#8599;</a>
-          <a class="osbtn" href="/check/">CHECK YOUR SPOT &#8599;</a>
-        </div>
-        <p>SEALED PIECES TRADE FROM THE FIRST MINT</p>
-      </div>
+<section class="hero">
+  <div class="moon scene"></div>
+  <svg class="ridge scene" viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,200 L0,186 L0,186 L11,116 L22,186 L23,186 L40,135 L58,186 L64,186 L81,128 L98,186 L99,186 L114,137 L130,186 L134,186 L149,138 L165,186 L167,172 L207,172 L207,172 L245,172 L245,186 L257,139 L270,186 L273,186 L284,107 L295,186 L297,186 L314,130 L332,186 L334,186 L353,129 L372,186 L378,186 L388,105 L398,186 L399,186 L415,107 L432,186 L439,186 L448,138 L458,186 L468,186 L480,130 L493,186 L497,186 L510,108 L524,186 L532,174 L575,174 L575,186 L585,134 L595,186 L602,186 L616,132 L630,186 L638,186 L648,106 L658,186 L664,186 L678,103 L693,186 L701,186 L717,137 L733,186 L735,180 L770,180 L770,186 L783,105 L797,186 L805,186 L820,119 L835,186 L836,179 L867,179 L867,186 L883,138 L900,186 L904,186 L911,133 L918,186 L924,186 L940,136 L957,186 L960,186 L977,124 L995,186 L998,177 L1035,177 L1035,186 L1043,135 L1052,186 L1061,180 L1085,180 L1085,186 L1097,127 L1110,186 L1111,186 L1129,130 L1147,186 L1152,186 L1163,115 L1174,186 L1180,186 L1194,133 L1208,186 L1209,186 L1226,116 L1244,186 L1251,186 L1261,111 L1272,186 L1279,186 L1289,128 L1299,186 L1307,186 L1321,103 L1335,186 L1336,186 L1354,132 L1372,186 L1374,181 L1413,181 L1413,186 L1425,102 L1437,186 L1440,186 L1440,200 Z" fill="#0c1425"/></svg>
+  <img class="archer scene" src="vault/silhouette-figure-dark.png" alt="">
+  <svg class="ridge scene front" viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,200 L0,186 L0,186 L13,94 L26,186 L32,186 L42,62 L53,186 L61,174 L95,174 L95,186 L105,107 L115,186 L117,186 L125,141 L133,186 L138,186 L150,56 L162,186 L168,186 L185,58 L203,186 L204,186 L212,136 L220,186 L224,186 L232,140 L240,186 L248,178 L279,178 L279,186 L296,95 L313,186 L317,186 L329,65 L341,186 L345,178 L388,178 L388,186 L404,94 L421,186 L422,177 L467,177 L467,186 L479,72 L491,186 L497,186 L511,93 L526,186 L528,186 L540,86 L553,186 L557,186 L573,77 L590,186 L591,186 L610,94 L629,186 L631,175 L654,175 L654,186 L661,141 L669,186 L674,186 L693,95 L712,186 L714,175 L757,175 L757,186 L767,70 L777,186 L780,186 L791,115 L802,186 L805,186 L821,65 L837,186 L840,186 L858,86 L877,186 L883,186 L900,108 L918,186 L919,186 L938,110 L957,186 L960,186 L972,64 L984,186 L988,186 L1000,98 L1012,186 L1016,186 L1024,148 L1033,186 L1042,176 L1063,176 L1063,172 L1104,172 L1104,175 L1140,175 L1140,179 L1176,179 L1176,186 L1193,84 L1210,186 L1211,179 L1255,179 L1255,186 L1266,105 L1277,186 L1280,186 L1290,81 L1301,186 L1302,186 L1319,83 L1336,186 L1344,186 L1350,128 L1357,186 L1360,186 L1373,114 L1386,186 L1388,186 L1405,115 L1423,186 L1425,186 L1443,84 L1462,186 L1440,186 L1440,200 Z" fill="#020308"/></svg>
+  <div class="label">A collection in dark crystal · Robinhood Chain</div>
+  <div class="giant">Hooded</div>
+  <div class="giant solid">Agents</div>
+  <div class="figure"><img src="vault/hero.webp" alt="Hooded Agent No. 001 — ruby"></div>
+  <div class="pedestal"></div>
+  <div class="hero-copy">
+    <div class="big">They were <em>cast,</em> not drawn.</div>
+    <p>Three thousand figures in dark crystal, sealed before anyone sees their faces. Crystal hands, a gem at every chest, a companion at every side — and one king among them, hidden until the reveal.</p>
+    <a class="textlink" href="/waitlist/">Enter the waitlist →</a>
+    <div style="margin-top:26px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <a class="btn fill" href="/check/">Check your wallet</a>
+      <a class="btn line" href="https://opensea.io/collections/chain/robinhood" target="_blank" rel="noopener">OpenSea</a>
     </div>
   </div>
+</section>
 
-  <div class="reveal">
-    <div class="qseal">?</div>
-    <h2>NOTHING IS SHOWN. <span>EVERYTHING IS SEALED.</span></h2>
-    <p>No trait previews. No rarity charts. No pictures of what is inside — not even the Hooded King. Every agent stays sealed until the mint closes and the whole collection opens at once on OpenSea.</p>
+<div class="marquee">Sealed — Unrevealed — Cast in crystal — Sealed — Unrevealed — Cast in crystal —</div>
+
+<section class="vault" id="vault">
+  <div class="vault-head">
+    <h2>Inside the <em>vault</em></h2>
+    <div class="label">Four of three thousand</div>
   </div>
+  <div class="row">
+    <div class="piece">
+      <div class="frame"><img src="vault/hero.webp" alt="Ruby"><div class="floor"></div></div>
+      <div class="meta"><span class="name">RUBY</span><span class="num">No. i</span></div>
+      <p class="desc">Blood-red hood. A fox that never leaves.</p>
+    </div>
+    <div class="piece">
+      <div class="frame"><img src="vault/emerald.webp" alt="Emerald"><div class="floor"></div></div>
+      <div class="meta"><span class="name">EMERALD</span><span class="num">No. ii</span></div>
+      <p class="desc">Forest dark. The wolf walks first.</p>
+    </div>
+    <div class="piece">
+      <div class="frame"><img src="vault/frost.webp" alt="Frost"><div class="floor"></div></div>
+      <div class="meta"><span class="name">FROST</span><span class="num">No. iii</span></div>
+      <p class="desc">Diamond heart. Nothing melts here.</p>
+    </div>
+    <div class="piece">
+      <div class="frame"><img src="vault/purple.webp" alt="Dusk"><div class="floor"></div></div>
+      <div class="meta"><span class="name">DUSK</span><span class="num">No. iv</span></div>
+      <p class="desc">Night violet. The owl sees for two.</p>
+    </div>
+  </div>
+</section>
 
-  <footer>
-    <div>DOTGENT NFT — ROBINHOOD CHAIN (4663)</div>
-    <div><a href="https://x.com/dotgent_" target="_blank" rel="noopener">X — @dotgent_</a> · CONTRACT: TBA · COLLECTION: OPENSEA (AUTO-INDEXED)</div>
-  </footer>
+<section class="king" id="king" style="position:relative; overflow:hidden;">
+  <div>
+    <div class="label" style="margin-bottom:14px;">One of one</div>
+    <h2>No crown is<br>given <em>twice.</em></h2>
+    <p>Somewhere in the three thousand stands the Hooded King — black hood, golden gem, a black lion at his heel. He is not sold separately. He is not announced. Whoever mints him, finds him.</p>
+    <a class="textlink" href="/waitlist/">Take your chance →</a>
+  </div>
+  <img src="vault/king.webp" alt="The Hooded King">
+</section>
 
-</div>
+<section class="join">
+  <div class="label" style="margin-bottom:16px;">The waitlist</div>
+  <h2>The list<br>is <em>open.</em></h2>
+  <p>Four small tasks stand between you and a guaranteed spot. Holders of seven collab collections are already inside. When the phases open — guaranteed, then first come, then public — the list goes first.</p>
+  <div class="actions">
+    <a class="btn fill" href="/waitlist/">Join the waitlist</a>
+    <a class="btn line" href="/check/">Check your spot</a>
+  </div>
+</section>
+
+<footer>
+  <span>Dotgent — The Hooded Agents</span>
+  <span>Robinhood Chain</span>
+</footer>
+
+<script>
+fetch("https://dotgent-giveaway.reuniakbarpunk212.workers.dev/waitlist/count").then(function(r){ return r.json(); }).then(function(d){
+  if (d && typeof d.count === "number") document.getElementById("wlCount").textContent = d.count;
+}).catch(function(){ document.getElementById("wlCount").textContent = "218"; });
+</script>
 </body>
 </html>
