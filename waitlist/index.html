@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DOTGENT — Whitelist | The Hooded Agents</title>
-<meta name="description" content="Join The Hooded Agents whitelist. Do the tasks, drop your X handle and EVM wallet, get your pass number. 3,000 sealed hooded archers on Robinhood Chain.">
+<meta name="description" content="Join The Hooded Agents whitelist. Do the tasks, drop your X handle and EVM wallet. 3,000 sealed hooded archers on Robinhood Chain.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Dotgent">
 <meta property="og:title" content="Dotgent — Whitelist">
-<meta property="og:description" content="The gate is open. Do the tasks, claim your pass number, join The Hooded Agents whitelist.">
+<meta property="og:description" content="The gate is open. Do the tasks, drop your wallet, join The Hooded Agents whitelist.">
 <meta property="og:url" content="https://dotgent.xyz/waitlist/">
 <meta property="og:image" content="https://dotgent.xyz/waitlist/pass-card.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Dotgent — Whitelist">
-<meta name="twitter:description" content="The gate is open. Do the tasks, claim your pass number, join The Hooded Agents whitelist.">
+<meta name="twitter:description" content="The gate is open. Do the tasks, drop your wallet, join The Hooded Agents whitelist.">
 <meta name="twitter:image" content="https://dotgent.xyz/waitlist/pass-card.png">
 <style>
   @font-face { font-family:'Marker'; src:url('../fonts/PermanentMarker.ttf') format('truetype'); }
@@ -142,7 +142,7 @@
   </div>
 
   <div class="pass">
-    <div class="prow"><span>ACCESS PASS</span><span class="no" id="passNo">No. 0000</span></div>
+    <div class="prow"><span>ACCESS PASS</span><span class="no">WHITELIST</span></div>
     <h2>Your<br><span class="gold">spot.</span></h2>
     <img class="sil" src="../bg-silhouette.webp" alt="">
     <div class="meter" id="meter"><i></i><i></i><i></i><i></i></div>
@@ -159,8 +159,8 @@
     </form>
 
     <div class="share" id="shareBox">
-      <a id="shareLink" href="#" target="_blank" rel="noopener"><span>Post your pass</span><span>&#8599;</span></a>
-      <div class="again">Your number is locked to your wallet. Post it so the forest sees you coming.</div>
+      <a id="shareLink" href="#" target="_blank" rel="noopener"><span>Post it</span><span>&#8599;</span></a>
+      <div class="again">Your wallet is on the list. Post it so the forest sees you coming.</div>
     </div>
 
     <div class="note">Finish the tasks, then enter your X handle and your public address. Never share your seed phrase &mdash; nobody from Dotgent will ever ask for it.</div>
@@ -209,20 +209,18 @@
     var lit = Math.round(p / 10);
     for (var i = 0; i < segs.length; i++) segs[i].classList.toggle("on", i < lit);
     if (myPass) {
-      document.getElementById("passNo").textContent = "No. " + myPass.pass.replace("DGT-", "");
-      ctaTxt.textContent = "Pass locked: " + myPass.pass;
+      ctaTxt.textContent = "You're on the list";
       ctaBtn.disabled = true;
       xInput.disabled = true; wInput.disabled = true;
-      var text = "I am joining the @dotgent_ whitelist. \u{1F3F9}\n" +
-        "Pass: " + myPass.pass + "\n\n" +
+      var text = "I am joining the @dotgent_ whitelist. \u{1F3F9}\n\n" +
         "The Hooded Agents \u2014 3,000 NFTs on the Robinhood Chain network. Every archer stays sealed until the reveal, and one 1/1 Hooded King is hiding in the supply.\n\n" +
-        "Claim your number before the gate fills up \u{1F447}";
+        "Claim your spot before the gate fills up \u{1F447}";
       document.getElementById("shareLink").href =
         "https://x.com/intent/post?text=" + encodeURIComponent(text) +
         "&url=" + encodeURIComponent("https://dotgent.xyz/waitlist/");
       document.getElementById("shareBox").style.display = "block";
     } else if (allDone()) {
-      ctaTxt.textContent = "Get my number";
+      ctaTxt.textContent = "Join the waitlist";
       ctaBtn.disabled = false;
     } else {
       ctaTxt.textContent = "Finish the tasks first";
@@ -279,7 +277,7 @@
     var rm = (repostUrl || "").match(REPOST_RE);
     if (!rm) { setMsg("Paste the link to your comment first — task 2 needs it.", "err"); return; }
     if (rm[2].toLowerCase() !== x.toLowerCase()) { setMsg("That comment link is from @" + rm[2] + ", not @" + x + ". Paste the link to your own comment.", "err"); return; }
-    ctaBtn.disabled = true; ctaTxt.textContent = "Carving your number...";
+    ctaBtn.disabled = true; ctaTxt.textContent = "Joining...";
     fetch(API + "/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -289,15 +287,15 @@
         var why = d && d.error === "repost_link_handle_mismatch" ? "The comment link must be from your own account."
           : d && d.error === "repost_link_required" ? "The gate now needs your comment link — paste it under task 2."
           : "Something jammed at the gate. Try again.";
-        setMsg(why, "err"); ctaBtn.disabled = false; ctaTxt.textContent = "Get my number"; return;
+        setMsg(why, "err"); ctaBtn.disabled = false; ctaTxt.textContent = "Join the waitlist"; return;
       }
-      myPass = { pass: d.pass, x: x, wallet: w.toLowerCase() };
+      myPass = { x: x, wallet: w.toLowerCase() };
       try { localStorage.setItem("dgt_wl_pass", JSON.stringify(myPass)); } catch(e) {}
-      setMsg(d.duplicate ? "You were already on the list — here's your number." : "You're in. Number carved.", "ok");
+      setMsg(d.duplicate ? "You were already on the list." : "You're in. Wallet saved.", "ok");
       render(); refreshCount();
     }).catch(function(){
       setMsg("The gate didn't answer. Check your connection and try again.", "err");
-      ctaBtn.disabled = false; ctaTxt.textContent = "Get my number";
+      ctaBtn.disabled = false; ctaTxt.textContent = "Join the waitlist";
     });
   });
 
@@ -319,7 +317,7 @@
         .then(function(r){ return r.json(); })
         .then(function(d){
           if (d && d.found) {
-            myPass = { pass: d.pass, x: d.x, wallet: d.wallet };
+            myPass = { x: d.x, wallet: d.wallet };
             try { localStorage.setItem("dgt_wl_pass", JSON.stringify(myPass)); } catch(e) {}
             render();
           }
