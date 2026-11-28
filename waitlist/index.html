@@ -90,6 +90,7 @@
     box-shadow:6px 6px 0 rgba(0,0,0,.55); transition:transform .12s ease, opacity .12s ease; }
   .cta:hover:not(:disabled) { transform:rotate(-.6deg) scale(1.01); }
   .cta:disabled { opacity:.38; cursor:not-allowed; box-shadow:none; }
+  .locknote { font-size:15px; color:#ffb52e; letter-spacing:.4px; margin:4px 0 14px; }
   .note { margin-top:16px; font-size:15.5px; line-height:1.5; color:#a99f83; }
   .msg { margin-top:14px; font-size:17px; min-height:22px; }
   .msg.err { color:#ff7a6b; } .msg.ok { color:#3ecf6f; }
@@ -123,21 +124,23 @@
       <div class="pts">+10 pts</div>
       <a class="go" data-task="follow" href="https://x.com/dotgent_" target="_blank" rel="noopener">&#8599;</a>
     </div>
-    <div class="task" id="task-repost">
+    <div class="task" id="task-like">
       <div class="num">02</div>
-      <div class="what"><div class="t">Like &amp; comment</div><div class="s">Comment on the pinned post — then paste your comment link below</div></div>
-      <div class="pts">+20 pts</div>
-      <a class="go" data-task="repost" href="https://x.com/dotgent_" target="_blank" rel="noopener">&#8599;</a>
-    </div>
-    <div class="tasklink" id="repostRow">
-      <input id="repostLink" type="url" placeholder="Paste your comment link — x.com/you/status/123..." autocomplete="off" spellcheck="false">
-      <div class="hint" id="repostHint">Drop a comment on the pinned post, then paste the link to your comment here — open your comment, tap Share, copy the link. The +20 pts land when the link checks out.</div>
-    </div>
-    <div class="task" id="task-bell">
-      <div class="num">03</div>
-      <div class="what"><div class="t">Turn on notifications</div><div class="s">Tap the bell on our profile</div></div>
+      <div class="what"><div class="t">Like the pinned post</div><div class="s">The pinned post on our profile</div></div>
       <div class="pts">+10 pts</div>
-      <a class="go" data-task="bell" href="https://x.com/dotgent_" target="_blank" rel="noopener">&#8599;</a>
+      <a class="go" data-task="like" href="https://x.com/dotgent_/status/2126530072169640318" target="_blank" rel="noopener">&#8599;</a>
+    </div>
+    <div class="task" id="task-retweet">
+      <div class="num">03</div>
+      <div class="what"><div class="t">Retweet the pinned post</div><div class="s">Put it in front of your forest</div></div>
+      <div class="pts">+10 pts</div>
+      <a class="go" data-task="retweet" href="https://x.com/intent/retweet?tweet_id=2126530072169640318" target="_blank" rel="noopener">&#8599;</a>
+    </div>
+    <div class="task" id="task-post">
+      <div class="num">04</div>
+      <div class="what"><div class="t">Post the template</div><div class="s">One tap — the text is ready, just hit Post</div></div>
+      <div class="pts">+10 pts</div>
+      <a class="go" data-task="post" id="postGo" href="#" target="_blank" rel="noopener">&#8599;</a>
     </div>
   </div>
 
@@ -149,19 +152,15 @@
     <div class="ptsline"><span id="ptsEarned">0</span> PTS EARNED</div>
     <div class="tear"></div>
 
+    <div class="locknote" id="formLock">Finish all 4 tasks above — then this form opens.</div>
     <form id="joinForm" autocomplete="off">
       <label for="xInput">X USERNAME</label>
-      <input id="xInput" type="text" placeholder="@username" maxlength="16" spellcheck="false">
+      <input id="xInput" type="text" placeholder="@username" maxlength="16" spellcheck="false" disabled>
       <label for="wInput">WALLET ADDRESS / EVM</label>
-      <input id="wInput" type="text" placeholder="0x0000...0000" maxlength="42" spellcheck="false">
+      <input id="wInput" type="text" placeholder="0x0000...0000" maxlength="42" spellcheck="false" disabled>
       <div class="msg" id="msg"></div>
       <button class="cta" id="ctaBtn" type="submit" disabled><span id="ctaTxt">Finish the tasks first</span><span>&#8599;</span></button>
     </form>
-
-    <div class="share" id="shareBox">
-      <a id="shareLink" href="#" target="_blank" rel="noopener"><span>Post it</span><span>&#8599;</span></a>
-      <div class="again">Your wallet is on the list. Post it so the forest sees you coming.</div>
-    </div>
 
     <div class="note">Finish the tasks, then enter your X handle and your public address. Never share your seed phrase &mdash; nobody from Dotgent will ever ask for it.</div>
   </div>
@@ -175,17 +174,17 @@
   // The pinned task post. Swap this one line when the task post changes.
   var TASK_POST_URL = "https://x.com/dotgent_/status/2126530072169640318";
   var API = "https://dotgent-giveaway.reuniakbarpunk212.workers.dev";
-  var PTS = { follow:10, repost:20, bell:10 };
+  var PTS = { follow:10, like:10, retweet:10, post:10 };
 
-  document.querySelector('[data-task="repost"]').href = TASK_POST_URL;
+  var TEMPLATE_TEXT = "I am joining the @dotgent_ whitelist. \u{1F3F9}\n\n" +
+    "The Hooded Agents \u2014 3,000 NFTs on the Robinhood Chain network. Every archer stays sealed until the reveal, and one 1/1 Hooded King is hiding in the supply.\n\n" +
+    "Claim your spot before the gate fills up \u{1F447}";
+  document.getElementById("postGo").href =
+    "https://x.com/intent/post?text=" + encodeURIComponent(TEMPLATE_TEXT) +
+    "&url=" + encodeURIComponent("https://dotgent.xyz/waitlist/");
 
   var done = {};
   try { done = JSON.parse(localStorage.getItem("dgt_wl_tasks") || "{}"); } catch(e) { done = {}; }
-  var repostUrl = "";
-  try { repostUrl = localStorage.getItem("dgt_wl_repost") || ""; } catch(e) {}
-  // Task 2 used to complete on a tap. It now needs the comment link, so a
-  // stored "done" without a link no longer counts.
-  if (done.repost && !repostUrl) done.repost = false;
   var myPass = null;
   try { myPass = JSON.parse(localStorage.getItem("dgt_wl_pass") || "null"); } catch(e) { myPass = null; }
 
@@ -196,7 +195,7 @@
   var wInput = document.getElementById("wInput");
 
   function ptsTotal(){ var s=0; for (var k in PTS) if (done[k]) s += PTS[k]; return s; }
-  function allDone(){ return done.follow && done.repost && done.bell; }
+  function allDone(){ return done.follow && done.like && done.retweet && done.post; }
 
   function render(){
     for (var k in PTS) {
@@ -212,58 +211,28 @@
       ctaTxt.textContent = "You're on the list";
       ctaBtn.disabled = true;
       xInput.disabled = true; wInput.disabled = true;
-      var text = "I am joining the @dotgent_ whitelist. \u{1F3F9}\n\n" +
-        "The Hooded Agents \u2014 3,000 NFTs on the Robinhood Chain network. Every archer stays sealed until the reveal, and one 1/1 Hooded King is hiding in the supply.\n\n" +
-        "Claim your spot before the gate fills up \u{1F447}";
-      document.getElementById("shareLink").href =
-        "https://x.com/intent/post?text=" + encodeURIComponent(text) +
-        "&url=" + encodeURIComponent("https://dotgent.xyz/waitlist/");
-      document.getElementById("shareBox").style.display = "block";
+      document.getElementById("formLock").style.display = "none";
     } else if (allDone()) {
       ctaTxt.textContent = "Join the waitlist";
       ctaBtn.disabled = false;
+      xInput.disabled = false; wInput.disabled = false;
+      document.getElementById("formLock").style.display = "none";
     } else {
       ctaTxt.textContent = "Finish the tasks first";
       ctaBtn.disabled = true;
+      xInput.disabled = true; wInput.disabled = true;
+      document.getElementById("formLock").style.display = "block";
     }
   }
 
   document.querySelectorAll(".go").forEach(function(a){
     a.addEventListener("click", function(){
       var k = a.getAttribute("data-task");
-      if (k === "repost") return; // completes only when the comment link checks out
       done[k] = true;
       try { localStorage.setItem("dgt_wl_tasks", JSON.stringify(done)); } catch(e) {}
       render();
     });
   });
-
-  var repostInput = document.getElementById("repostLink");
-  var repostHint = document.getElementById("repostHint");
-  var REPOST_RE = /^https:\/\/(x\.com|twitter\.com)\/([A-Za-z0-9_]{1,15})\/status\/\d+/i;
-  function checkRepost(){
-    var v = repostInput.value.trim();
-    var m = v.match(REPOST_RE);
-    if (!v) {
-      repostHint.textContent = "Drop a comment on the pinned post, then paste the link to your comment here — open your comment, tap Share, copy the link. The +20 pts land when the link checks out.";
-      repostHint.className = "hint";
-    } else if (m) {
-      repostHint.textContent = "Link locked in — @" + m[2] + ". Make sure the handle matches the X username you enter below.";
-      repostHint.className = "hint ok";
-    } else {
-      repostHint.textContent = "That doesn't look like a link to an X post. Open your comment, copy its link, and paste it here.";
-      repostHint.className = "hint err";
-    }
-    repostUrl = m ? v : "";
-    done.repost = !!m;
-    try {
-      localStorage.setItem("dgt_wl_tasks", JSON.stringify(done));
-      if (m) localStorage.setItem("dgt_wl_repost", v); else localStorage.removeItem("dgt_wl_repost");
-    } catch(e) {}
-    render();
-  }
-  repostInput.addEventListener("input", checkRepost);
-  if (repostUrl) { repostInput.value = repostUrl; checkRepost(); }
 
   function setMsg(t, cls){ msg.textContent = t; msg.className = "msg " + (cls || ""); }
 
@@ -274,19 +243,14 @@
     var w = wInput.value.trim();
     if (!/^[A-Za-z0-9_]{1,15}$/.test(x)) { setMsg("That X handle doesn't look right.", "err"); return; }
     if (!/^0x[0-9a-fA-F]{40}$/.test(w)) { setMsg("That wallet address doesn't look right.", "err"); return; }
-    var rm = (repostUrl || "").match(REPOST_RE);
-    if (!rm) { setMsg("Paste the link to your comment first — task 2 needs it.", "err"); return; }
-    if (rm[2].toLowerCase() !== x.toLowerCase()) { setMsg("That comment link is from @" + rm[2] + ", not @" + x + ". Paste the link to your own comment.", "err"); return; }
     ctaBtn.disabled = true; ctaTxt.textContent = "Joining...";
     fetch(API + "/waitlist", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ x: x, wallet: w, pts: ptsTotal(), repost: repostUrl })
+      body: JSON.stringify({ x: x, wallet: w, pts: ptsTotal() })
     }).then(function(r){ return r.json(); }).then(function(d){
       if (!d || !d.ok) {
-        var why = d && d.error === "repost_link_handle_mismatch" ? "The comment link must be from your own account."
-          : d && d.error === "repost_link_required" ? "The gate now needs your comment link — paste it under task 2."
-          : "Something jammed at the gate. Try again.";
+        var why = "Something jammed at the gate. Try again.";
         setMsg(why, "err"); ctaBtn.disabled = false; ctaTxt.textContent = "Join the waitlist"; return;
       }
       myPass = { x: x, wallet: w.toLowerCase() };
