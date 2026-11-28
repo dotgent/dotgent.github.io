@@ -76,17 +76,14 @@
   .inkbar i { display:block; height:100%; width:0%;
     background:repeating-linear-gradient(-45deg,#2fbf5a 0 14px,#27a34b 14px 28px); }
   .supply .lbl { font-size:15px; letter-spacing:3px; margin-top:9px; color:#5d4c2c; }
-  .mintbtn { flex:0 1 300px; text-align:center; }
+  .mintbtn { flex:1 1 380px; text-align:center; }
+  .btnrow { display:flex; gap:16px; flex-wrap:wrap; }
+  .btnrow .osbtn { flex:1 1 200px; }
   .osbtn { display:block; width:100%; padding:19px 14px; font-family:'Marker', cursive; font-size:21px; letter-spacing:.5px;
     background:#2fbf5a; color:#0d2013; text-decoration:none; transform:rotate(-1.2deg);
     border:3px solid #12351c; border-radius:16px 5px 18px 6px/6px 18px 5px 16px;
     box-shadow:6px 7px 0 rgba(20,15,5,.75); transition:transform .12s, box-shadow .12s; }
   .osbtn:hover { transform:rotate(-1.2deg) translate(-2px,-2px); box-shadow:9px 10px 0 rgba(20,15,5,.75); }
-  .wlbtn { display:inline-block; margin-top:24px; padding:16px 26px; font-family:'Marker', cursive; font-size:22px; letter-spacing:.5px;
-    background:#ffb52e; color:#171208; text-decoration:none; transform:rotate(-1.2deg);
-    border:3px solid #171208; border-radius:16px 5px 18px 6px/6px 18px 5px 16px;
-    box-shadow:6px 7px 0 rgba(0,0,0,.55); transition:transform .12s, box-shadow .12s; }
-  .wlbtn:hover { transform:rotate(-1.2deg) translate(-2px,-2px); box-shadow:9px 10px 0 rgba(0,0,0,.55); }
   .mintbtn p { font-size:14.5px; color:#5d4c2c; margin-top:14px; letter-spacing:1.2px; }
 
   /* ── sealed manifesto ── */
@@ -134,7 +131,6 @@
       <h1>THE HOODED<br>AGENTS <span class="gold">OF<br>SHERWOOD</span></h1>
       <p class="sub">3,000 hooded archers on Robinhood Chain. Every mint is sealed — nobody knows which agent they hold until the reveal. One wallet walks away with the <b>1/1 Hooded King</b>.</p>
       <p class="scribble"><span class="arr">→</span> that's him. no, you can't see his face. that's the point.</p>
-      <a class="wlbtn" href="/waitlist/">JOIN THE WAITLIST &#8599;</a>
     </div>
     <div class="hero-img">
       <div class="photo">
@@ -154,7 +150,10 @@
         <div class="lbl">MINTED SO FAR</div>
       </div>
       <div class="mintbtn">
-        <a class="osbtn" href="https://opensea.io/collections/chain/robinhood" target="_blank" rel="noopener">VIEW ON OPENSEA</a>
+        <div class="btnrow">
+          <a class="osbtn" href="https://opensea.io/collections/chain/robinhood" target="_blank" rel="noopener">VIEW ON OPENSEA</a>
+          <a class="osbtn" href="/waitlist/">JOIN THE WAITLIST &#8599;</a>
+        </div>
         <p>SEALED PIECES TRADE FROM THE FIRST MINT</p>
       </div>
     </div>
